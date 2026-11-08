@@ -1,0 +1,867 @@
+{
+  "name": "Global WAN - 4 cities + Cloud VPC, 2,000 IoT/scanners",
+  "profile": "global_wan",
+  "topology": "Hub-and-spoke WAN with cloud transit at hub",
+  "routing": {
+    "igp": "OSPF multi-area",
+    "areas": {
+      "DELHI": 0,
+      "MUMBAI": 1,
+      "BENGALURU": 2,
+      "CHENNAI": 3
+    },
+    "ebgp": true,
+    "local_asn": 65050,
+    "peer_asn": 64512,
+    "summarize": true,
+    "bfd": false
+  },
+  "site_blocks": {
+    "DELHI": "10.50.0.0/21",
+    "MUMBAI": "10.50.8.0/21",
+    "BENGALURU": "10.50.16.0/22",
+    "CHENNAI": "10.50.20.0/22"
+  },
+  "media": [
+    {
+      "link": "DEL-BOM-WAN",
+      "distance_m": 1400000.0,
+      "media": "Carrier WAN circuit (MEF E-Line / Internet)",
+      "transceiver": "1000BASE-LX SFP at carrier NID",
+      "standard": "MEF 6.2 / IEEE 802.3",
+      "wavelength_nm": 1310,
+      "lanes": 1,
+      "bandwidth_gbps": 1.0,
+      "loss_db": null,
+      "budget_db": null,
+      "margin_db": null,
+      "attenuator_db": 0,
+      "latency_ms": 8.918,
+      "notes": []
+    },
+    {
+      "link": "DEL-BLR-WAN",
+      "distance_m": 2150000.0,
+      "media": "Carrier WAN circuit (MEF E-Line / Internet)",
+      "transceiver": "1000BASE-LX SFP at carrier NID",
+      "standard": "MEF 6.2 / IEEE 802.3",
+      "wavelength_nm": 1310,
+      "lanes": 1,
+      "bandwidth_gbps": 1.0,
+      "loss_db": null,
+      "budget_db": null,
+      "margin_db": null,
+      "attenuator_db": 0,
+      "latency_ms": 13.696,
+      "notes": []
+    },
+    {
+      "link": "DEL-MAA-WAN",
+      "distance_m": 2200000.0,
+      "media": "Carrier WAN circuit (MEF E-Line / Internet)",
+      "transceiver": "1000BASE-LX SFP at carrier NID",
+      "standard": "MEF 6.2 / IEEE 802.3",
+      "wavelength_nm": 1310,
+      "lanes": 1,
+      "bandwidth_gbps": 1.0,
+      "loss_db": null,
+      "budget_db": null,
+      "margin_db": null,
+      "attenuator_db": 0,
+      "latency_ms": 14.014,
+      "notes": []
+    }
+  ],
+  "subnets": [
+    {
+      "name": "DEL-USERS",
+      "site": "DELHI",
+      "vlan": 10,
+      "role": "data",
+      "cidr": "10.50.0.0/23",
+      "mask": "255.255.254.0",
+      "wildcard": "0.0.1.255",
+      "gateway": "10.50.0.1",
+      "first_host": "10.50.0.1",
+      "last_host": "10.50.1.254",
+      "broadcast": "10.50.1.255",
+      "hosts_requested": 300,
+      "usable": 510,
+      "utilization_pct": 58.8
+    },
+    {
+      "name": "DEL-IOT",
+      "site": "DELHI",
+      "vlan": 30,
+      "role": "iot",
+      "cidr": "10.50.2.0/23",
+      "mask": "255.255.254.0",
+      "wildcard": "0.0.1.255",
+      "gateway": "10.50.2.1",
+      "first_host": "10.50.2.1",
+      "last_host": "10.50.3.254",
+      "broadcast": "10.50.3.255",
+      "hosts_requested": 300,
+      "usable": 510,
+      "utilization_pct": 58.8
+    },
+    {
+      "name": "DEL-SCANNERS",
+      "site": "DELHI",
+      "vlan": 40,
+      "role": "scanners",
+      "cidr": "10.50.4.0/24",
+      "mask": "255.255.255.0",
+      "wildcard": "0.0.0.255",
+      "gateway": "10.50.4.1",
+      "first_host": "10.50.4.1",
+      "last_host": "10.50.4.254",
+      "broadcast": "10.50.4.255",
+      "hosts_requested": 150,
+      "usable": 254,
+      "utilization_pct": 59.1
+    },
+    {
+      "name": "DEL-MGMT",
+      "site": "DELHI",
+      "vlan": 99,
+      "role": "mgmt",
+      "cidr": "10.50.5.0/27",
+      "mask": "255.255.255.224",
+      "wildcard": "0.0.0.31",
+      "gateway": "10.50.5.1",
+      "first_host": "10.50.5.1",
+      "last_host": "10.50.5.30",
+      "broadcast": "10.50.5.31",
+      "hosts_requested": 20,
+      "usable": 30,
+      "utilization_pct": 66.7
+    },
+    {
+      "name": "LO-DEL-RTR1",
+      "site": "DELHI",
+      "vlan": null,
+      "role": "loopback",
+      "cidr": "10.50.5.32/32",
+      "mask": "255.255.255.255",
+      "wildcard": "0.0.0.0",
+      "gateway": "10.50.5.32",
+      "first_host": "10.50.5.32",
+      "last_host": "10.50.5.32",
+      "broadcast": null,
+      "hosts_requested": 1,
+      "usable": 1,
+      "utilization_pct": 100.0
+    },
+    {
+      "name": "BOM-IOT",
+      "site": "MUMBAI",
+      "vlan": 30,
+      "role": "iot",
+      "cidr": "10.50.8.0/23",
+      "mask": "255.255.254.0",
+      "wildcard": "0.0.1.255",
+      "gateway": "10.50.8.1",
+      "first_host": "10.50.8.1",
+      "last_host": "10.50.9.254",
+      "broadcast": "10.50.9.255",
+      "hosts_requested": 350,
+      "usable": 510,
+      "utilization_pct": 68.6
+    },
+    {
+      "name": "BOM-USERS",
+      "site": "MUMBAI",
+      "vlan": 10,
+      "role": "data",
+      "cidr": "10.50.10.0/24",
+      "mask": "255.255.255.0",
+      "wildcard": "0.0.0.255",
+      "gateway": "10.50.10.1",
+      "first_host": "10.50.10.1",
+      "last_host": "10.50.10.254",
+      "broadcast": "10.50.10.255",
+      "hosts_requested": 150,
+      "usable": 254,
+      "utilization_pct": 59.1
+    },
+    {
+      "name": "BOM-SCANNERS",
+      "site": "MUMBAI",
+      "vlan": 40,
+      "role": "scanners",
+      "cidr": "10.50.11.0/24",
+      "mask": "255.255.255.0",
+      "wildcard": "0.0.0.255",
+      "gateway": "10.50.11.1",
+      "first_host": "10.50.11.1",
+      "last_host": "10.50.11.254",
+      "broadcast": "10.50.11.255",
+      "hosts_requested": 150,
+      "usable": 254,
+      "utilization_pct": 59.1
+    },
+    {
+      "name": "BOM-MGMT",
+      "site": "MUMBAI",
+      "vlan": 99,
+      "role": "mgmt",
+      "cidr": "10.50.12.0/27",
+      "mask": "255.255.255.224",
+      "wildcard": "0.0.0.31",
+      "gateway": "10.50.12.1",
+      "first_host": "10.50.12.1",
+      "last_host": "10.50.12.30",
+      "broadcast": "10.50.12.31",
+      "hosts_requested": 20,
+      "usable": 30,
+      "utilization_pct": 66.7
+    },
+    {
+      "name": "DEL-BOM-WAN-P2P",
+      "site": "MUMBAI",
+      "vlan": null,
+      "role": "p2p",
+      "cidr": "10.50.12.32/31",
+      "mask": "255.255.255.254",
+      "wildcard": "0.0.0.1",
+      "gateway": "10.50.12.32",
+      "first_host": "10.50.12.32",
+      "last_host": "10.50.12.33",
+      "broadcast": null,
+      "hosts_requested": 2,
+      "usable": 2,
+      "utilization_pct": 100.0
+    },
+    {
+      "name": "LO-BOM-RTR1",
+      "site": "MUMBAI",
+      "vlan": null,
+      "role": "loopback",
+      "cidr": "10.50.12.34/32",
+      "mask": "255.255.255.255",
+      "wildcard": "0.0.0.0",
+      "gateway": "10.50.12.34",
+      "first_host": "10.50.12.34",
+      "last_host": "10.50.12.34",
+      "broadcast": null,
+      "hosts_requested": 1,
+      "usable": 1,
+      "utilization_pct": 100.0
+    },
+    {
+      "name": "BLR-IOT",
+      "site": "BENGALURU",
+      "vlan": 30,
+      "role": "iot",
+      "cidr": "10.50.16.0/23",
+      "mask": "255.255.254.0",
+      "wildcard": "0.0.1.255",
+      "gateway": "10.50.16.1",
+      "first_host": "10.50.16.1",
+      "last_host": "10.50.17.254",
+      "broadcast": "10.50.17.255",
+      "hosts_requested": 400,
+      "usable": 510,
+      "utilization_pct": 78.4
+    },
+    {
+      "name": "BLR-SCANNERS",
+      "site": "BENGALURU",
+      "vlan": 40,
+      "role": "scanners",
+      "cidr": "10.50.18.0/24",
+      "mask": "255.255.255.0",
+      "wildcard": "0.0.0.255",
+      "gateway": "10.50.18.1",
+      "first_host": "10.50.18.1",
+      "last_host": "10.50.18.254",
+      "broadcast": "10.50.18.255",
+      "hosts_requested": 150,
+      "usable": 254,
+      "utilization_pct": 59.1
+    },
+    {
+      "name": "BLR-USERS",
+      "site": "BENGALURU",
+      "vlan": 10,
+      "role": "data",
+      "cidr": "10.50.19.0/25",
+      "mask": "255.255.255.128",
+      "wildcard": "0.0.0.127",
+      "gateway": "10.50.19.1",
+      "first_host": "10.50.19.1",
+      "last_host": "10.50.19.126",
+      "broadcast": "10.50.19.127",
+      "hosts_requested": 120,
+      "usable": 126,
+      "utilization_pct": 95.2
+    },
+    {
+      "name": "BLR-MGMT",
+      "site": "BENGALURU",
+      "vlan": 99,
+      "role": "mgmt",
+      "cidr": "10.50.19.128/27",
+      "mask": "255.255.255.224",
+      "wildcard": "0.0.0.31",
+      "gateway": "10.50.19.129",
+      "first_host": "10.50.19.129",
+      "last_host": "10.50.19.158",
+      "broadcast": "10.50.19.159",
+      "hosts_requested": 20,
+      "usable": 30,
+      "utilization_pct": 66.7
+    },
+    {
+      "name": "DEL-BLR-WAN-P2P",
+      "site": "BENGALURU",
+      "vlan": null,
+      "role": "p2p",
+      "cidr": "10.50.19.160/31",
+      "mask": "255.255.255.254",
+      "wildcard": "0.0.0.1",
+      "gateway": "10.50.19.160",
+      "first_host": "10.50.19.160",
+      "last_host": "10.50.19.161",
+      "broadcast": null,
+      "hosts_requested": 2,
+      "usable": 2,
+      "utilization_pct": 100.0
+    },
+    {
+      "name": "LO-BLR-RTR1",
+      "site": "BENGALURU",
+      "vlan": null,
+      "role": "loopback",
+      "cidr": "10.50.19.162/32",
+      "mask": "255.255.255.255",
+      "wildcard": "0.0.0.0",
+      "gateway": "10.50.19.162",
+      "first_host": "10.50.19.162",
+      "last_host": "10.50.19.162",
+      "broadcast": null,
+      "hosts_requested": 1,
+      "usable": 1,
+      "utilization_pct": 100.0
+    },
+    {
+      "name": "MAA-IOT",
+      "site": "CHENNAI",
+      "vlan": 30,
+      "role": "iot",
+      "cidr": "10.50.20.0/23",
+      "mask": "255.255.254.0",
+      "wildcard": "0.0.1.255",
+      "gateway": "10.50.20.1",
+      "first_host": "10.50.20.1",
+      "last_host": "10.50.21.254",
+      "broadcast": "10.50.21.255",
+      "hosts_requested": 350,
+      "usable": 510,
+      "utilization_pct": 68.6
+    },
+    {
+      "name": "MAA-SCANNERS",
+      "site": "CHENNAI",
+      "vlan": 40,
+      "role": "scanners",
+      "cidr": "10.50.22.0/24",
+      "mask": "255.255.255.0",
+      "wildcard": "0.0.0.255",
+      "gateway": "10.50.22.1",
+      "first_host": "10.50.22.1",
+      "last_host": "10.50.22.254",
+      "broadcast": "10.50.22.255",
+      "hosts_requested": 150,
+      "usable": 254,
+      "utilization_pct": 59.1
+    },
+    {
+      "name": "MAA-USERS",
+      "site": "CHENNAI",
+      "vlan": 10,
+      "role": "data",
+      "cidr": "10.50.23.0/25",
+      "mask": "255.255.255.128",
+      "wildcard": "0.0.0.127",
+      "gateway": "10.50.23.1",
+      "first_host": "10.50.23.1",
+      "last_host": "10.50.23.126",
+      "broadcast": "10.50.23.127",
+      "hosts_requested": 80,
+      "usable": 126,
+      "utilization_pct": 63.5
+    },
+    {
+      "name": "MAA-MGMT",
+      "site": "CHENNAI",
+      "vlan": 99,
+      "role": "mgmt",
+      "cidr": "10.50.23.128/27",
+      "mask": "255.255.255.224",
+      "wildcard": "0.0.0.31",
+      "gateway": "10.50.23.129",
+      "first_host": "10.50.23.129",
+      "last_host": "10.50.23.158",
+      "broadcast": "10.50.23.159",
+      "hosts_requested": 20,
+      "usable": 30,
+      "utilization_pct": 66.7
+    },
+    {
+      "name": "DEL-MAA-WAN-P2P",
+      "site": "CHENNAI",
+      "vlan": null,
+      "role": "p2p",
+      "cidr": "10.50.23.160/31",
+      "mask": "255.255.255.254",
+      "wildcard": "0.0.0.1",
+      "gateway": "10.50.23.160",
+      "first_host": "10.50.23.160",
+      "last_host": "10.50.23.161",
+      "broadcast": null,
+      "hosts_requested": 2,
+      "usable": 2,
+      "utilization_pct": 100.0
+    },
+    {
+      "name": "LO-MAA-RTR1",
+      "site": "CHENNAI",
+      "vlan": null,
+      "role": "loopback",
+      "cidr": "10.50.23.162/32",
+      "mask": "255.255.255.255",
+      "wildcard": "0.0.0.0",
+      "gateway": "10.50.23.162",
+      "first_host": "10.50.23.162",
+      "last_host": "10.50.23.162",
+      "broadcast": null,
+      "hosts_requested": 1,
+      "usable": 1,
+      "utilization_pct": 100.0
+    }
+  ],
+  "latency": [
+    {
+      "link": "DEL-BOM-WAN",
+      "path": "primary",
+      "one_way_ms": 8.95,
+      "rtt_ms": 17.9,
+      "budget_ms": null,
+      "ok": true
+    },
+    {
+      "link": "DEL-BLR-WAN",
+      "path": "primary",
+      "one_way_ms": 13.728,
+      "rtt_ms": 27.456,
+      "budget_ms": null,
+      "ok": true
+    },
+    {
+      "link": "DEL-MAA-WAN",
+      "path": "primary",
+      "one_way_ms": 14.046,
+      "rtt_ms": 28.092,
+      "budget_ms": null,
+      "ok": true
+    }
+  ],
+  "warnings": [],
+  "rationale": [
+    {
+      "domain": "Topology",
+      "subject": "Profile 'global_wan'",
+      "decision": "Hub-and-spoke WAN with cloud transit at hub",
+      "justification": "4 cities plus a cloud VPC: HQ is the OSPF backbone and the single controlled egress to the cloud (IPsec + eBGP), so security policy is enforced in one place and remote areas only need a path to the hub.",
+      "references": [
+        "Cisco SAFE/Campus design guides"
+      ]
+    },
+    {
+      "domain": "VLSM",
+      "subject": "Site block BENGALURU",
+      "decision": "10.50.16.0/22",
+      "justification": "Site subnets need 931 addresses in total; rounded up to one power-of-two block (/22, 1024 addresses) so the whole site can be advertised as a single summary route 10.50.16.0/22.",
+      "references": [
+        "RFC 4632"
+      ]
+    },
+    {
+      "domain": "VLSM",
+      "subject": "Site block CHENNAI",
+      "decision": "10.50.20.0/22",
+      "justification": "Site subnets need 931 addresses in total; rounded up to one power-of-two block (/22, 1024 addresses) so the whole site can be advertised as a single summary route 10.50.20.0/22.",
+      "references": [
+        "RFC 4632"
+      ]
+    },
+    {
+      "domain": "VLSM",
+      "subject": "Site block DELHI",
+      "decision": "10.50.0.0/21",
+      "justification": "Site subnets need 1313 addresses in total; rounded up to one power-of-two block (/21, 2048 addresses) so the whole site can be advertised as a single summary route 10.50.0.0/21.",
+      "references": [
+        "RFC 4632"
+      ]
+    },
+    {
+      "domain": "VLSM",
+      "subject": "Site block MUMBAI",
+      "decision": "10.50.8.0/21",
+      "justification": "Site subnets need 1059 addresses in total; rounded up to one power-of-two block (/21, 2048 addresses) so the whole site can be advertised as a single summary route 10.50.8.0/21.",
+      "references": [
+        "RFC 4632"
+      ]
+    },
+    {
+      "domain": "VLSM",
+      "subject": "DEL-USERS",
+      "decision": "10.50.0.0/23",
+      "justification": "300 hosts + 2 (network, broadcast) = 302 addresses; smallest power of two >= that is 2^9 = 512 -> /23 (mask 255.255.254.0, wildcard 0.0.1.255). Gateway 10.50.0.1 (first usable), broadcast 10.50.1.255. Utilization 300/510 = 58.8%.",
+      "references": [
+        "RFC 950",
+        "RFC 1878"
+      ]
+    },
+    {
+      "domain": "VLSM",
+      "subject": "DEL-IOT",
+      "decision": "10.50.2.0/23",
+      "justification": "300 hosts + 2 (network, broadcast) = 302 addresses; smallest power of two >= that is 2^9 = 512 -> /23 (mask 255.255.254.0, wildcard 0.0.1.255). Gateway 10.50.2.1 (first usable), broadcast 10.50.3.255. Utilization 300/510 = 58.8%.",
+      "references": [
+        "RFC 950",
+        "RFC 1878"
+      ]
+    },
+    {
+      "domain": "VLSM",
+      "subject": "DEL-SCANNERS",
+      "decision": "10.50.4.0/24",
+      "justification": "150 hosts + 2 (network, broadcast) = 152 addresses; smallest power of two >= that is 2^8 = 256 -> /24 (mask 255.255.255.0, wildcard 0.0.0.255). Gateway 10.50.4.1 (first usable), broadcast 10.50.4.255. Utilization 150/254 = 59.1%.",
+      "references": [
+        "RFC 950",
+        "RFC 1878"
+      ]
+    },
+    {
+      "domain": "VLSM",
+      "subject": "DEL-MGMT",
+      "decision": "10.50.5.0/27",
+      "justification": "20 hosts + 2 (network, broadcast) = 22 addresses; smallest power of two >= that is 2^5 = 32 -> /27 (mask 255.255.255.224, wildcard 0.0.0.31). Gateway 10.50.5.1 (first usable), broadcast 10.50.5.31. Utilization 20/30 = 66.7%.",
+      "references": [
+        "RFC 950",
+        "RFC 1878"
+      ]
+    },
+    {
+      "domain": "VLSM",
+      "subject": "LO-DEL-RTR1",
+      "decision": "10.50.5.32/32",
+      "justification": "Router loopback / router-ID: a /32 host route is stable and always up.",
+      "references": [
+        "RFC 2328 s.C.1"
+      ]
+    },
+    {
+      "domain": "VLSM",
+      "subject": "site DELHI 10.50.0.0/21",
+      "decision": "5 subnets, 1313 addresses",
+      "justification": "Requests were sorted by required block size (largest first) and placed sequentially on their natural bit boundaries, which guarantees zero overlap and no fragmentation. 1313 of 2048 addresses consumed (64.1% of the block); host efficiency 771/1305 usable = 59.1%. Remaining 735 addresses are contiguous at the top of the block for growth.",
+      "references": [
+        "RFC 1878",
+        "RFC 4632",
+        "RFC 1918"
+      ]
+    },
+    {
+      "domain": "VLSM",
+      "subject": "BOM-IOT",
+      "decision": "10.50.8.0/23",
+      "justification": "350 hosts + 2 (network, broadcast) = 352 addresses; smallest power of two >= that is 2^9 = 512 -> /23 (mask 255.255.254.0, wildcard 0.0.1.255). Gateway 10.50.8.1 (first usable), broadcast 10.50.9.255. Utilization 350/510 = 68.6%.",
+      "references": [
+        "RFC 950",
+        "RFC 1878"
+      ]
+    },
+    {
+      "domain": "VLSM",
+      "subject": "BOM-USERS",
+      "decision": "10.50.10.0/24",
+      "justification": "150 hosts + 2 (network, broadcast) = 152 addresses; smallest power of two >= that is 2^8 = 256 -> /24 (mask 255.255.255.0, wildcard 0.0.0.255). Gateway 10.50.10.1 (first usable), broadcast 10.50.10.255. Utilization 150/254 = 59.1%.",
+      "references": [
+        "RFC 950",
+        "RFC 1878"
+      ]
+    },
+    {
+      "domain": "VLSM",
+      "subject": "BOM-SCANNERS",
+      "decision": "10.50.11.0/24",
+      "justification": "150 hosts + 2 (network, broadcast) = 152 addresses; smallest power of two >= that is 2^8 = 256 -> /24 (mask 255.255.255.0, wildcard 0.0.0.255). Gateway 10.50.11.1 (first usable), broadcast 10.50.11.255. Utilization 150/254 = 59.1%.",
+      "references": [
+        "RFC 950",
+        "RFC 1878"
+      ]
+    },
+    {
+      "domain": "VLSM",
+      "subject": "BOM-MGMT",
+      "decision": "10.50.12.0/27",
+      "justification": "20 hosts + 2 (network, broadcast) = 22 addresses; smallest power of two >= that is 2^5 = 32 -> /27 (mask 255.255.255.224, wildcard 0.0.0.31). Gateway 10.50.12.1 (first usable), broadcast 10.50.12.31. Utilization 20/30 = 66.7%.",
+      "references": [
+        "RFC 950",
+        "RFC 1878"
+      ]
+    },
+    {
+      "domain": "VLSM",
+      "subject": "DEL-BOM-WAN-P2P",
+      "decision": "10.50.12.32/31",
+      "justification": "Point-to-point link: RFC 3021 /31 uses both addresses as hosts (no network/broadcast needed on a 2-node link), saving 50% vs a /30.",
+      "references": [
+        "RFC 3021"
+      ]
+    },
+    {
+      "domain": "VLSM",
+      "subject": "LO-BOM-RTR1",
+      "decision": "10.50.12.34/32",
+      "justification": "Router loopback / router-ID: a /32 host route is stable and always up.",
+      "references": [
+        "RFC 2328 s.C.1"
+      ]
+    },
+    {
+      "domain": "VLSM",
+      "subject": "site MUMBAI 10.50.8.0/21",
+      "decision": "6 subnets, 1059 addresses",
+      "justification": "Requests were sorted by required block size (largest first) and placed sequentially on their natural bit boundaries, which guarantees zero overlap and no fragmentation. 1059 of 2048 addresses consumed (51.7% of the block); host efficiency 673/1051 usable = 64.0%. Remaining 989 addresses are contiguous at the top of the block for growth.",
+      "references": [
+        "RFC 1878",
+        "RFC 4632",
+        "RFC 1918"
+      ]
+    },
+    {
+      "domain": "VLSM",
+      "subject": "BLR-IOT",
+      "decision": "10.50.16.0/23",
+      "justification": "400 hosts + 2 (network, broadcast) = 402 addresses; smallest power of two >= that is 2^9 = 512 -> /23 (mask 255.255.254.0, wildcard 0.0.1.255). Gateway 10.50.16.1 (first usable), broadcast 10.50.17.255. Utilization 400/510 = 78.4%.",
+      "references": [
+        "RFC 950",
+        "RFC 1878"
+      ]
+    },
+    {
+      "domain": "VLSM",
+      "subject": "BLR-SCANNERS",
+      "decision": "10.50.18.0/24",
+      "justification": "150 hosts + 2 (network, broadcast) = 152 addresses; smallest power of two >= that is 2^8 = 256 -> /24 (mask 255.255.255.0, wildcard 0.0.0.255). Gateway 10.50.18.1 (first usable), broadcast 10.50.18.255. Utilization 150/254 = 59.1%.",
+      "references": [
+        "RFC 950",
+        "RFC 1878"
+      ]
+    },
+    {
+      "domain": "VLSM",
+      "subject": "BLR-USERS",
+      "decision": "10.50.19.0/25",
+      "justification": "120 hosts + 2 (network, broadcast) = 122 addresses; smallest power of two >= that is 2^7 = 128 -> /25 (mask 255.255.255.128, wildcard 0.0.0.127). Gateway 10.50.19.1 (first usable), broadcast 10.50.19.127. Utilization 120/126 = 95.2%.",
+      "references": [
+        "RFC 950",
+        "RFC 1878"
+      ]
+    },
+    {
+      "domain": "VLSM",
+      "subject": "BLR-MGMT",
+      "decision": "10.50.19.128/27",
+      "justification": "20 hosts + 2 (network, broadcast) = 22 addresses; smallest power of two >= that is 2^5 = 32 -> /27 (mask 255.255.255.224, wildcard 0.0.0.31). Gateway 10.50.19.129 (first usable), broadcast 10.50.19.159. Utilization 20/30 = 66.7%.",
+      "references": [
+        "RFC 950",
+        "RFC 1878"
+      ]
+    },
+    {
+      "domain": "VLSM",
+      "subject": "DEL-BLR-WAN-P2P",
+      "decision": "10.50.19.160/31",
+      "justification": "Point-to-point link: RFC 3021 /31 uses both addresses as hosts (no network/broadcast needed on a 2-node link), saving 50% vs a /30.",
+      "references": [
+        "RFC 3021"
+      ]
+    },
+    {
+      "domain": "VLSM",
+      "subject": "LO-BLR-RTR1",
+      "decision": "10.50.19.162/32",
+      "justification": "Router loopback / router-ID: a /32 host route is stable and always up.",
+      "references": [
+        "RFC 2328 s.C.1"
+      ]
+    },
+    {
+      "domain": "VLSM",
+      "subject": "site BENGALURU 10.50.16.0/22",
+      "decision": "6 subnets, 931 addresses",
+      "justification": "Requests were sorted by required block size (largest first) and placed sequentially on their natural bit boundaries, which guarantees zero overlap and no fragmentation. 931 of 1024 addresses consumed (90.9% of the block); host efficiency 693/923 usable = 75.1%. Remaining 93 addresses are contiguous at the top of the block for growth.",
+      "references": [
+        "RFC 1878",
+        "RFC 4632",
+        "RFC 1918"
+      ]
+    },
+    {
+      "domain": "VLSM",
+      "subject": "MAA-IOT",
+      "decision": "10.50.20.0/23",
+      "justification": "350 hosts + 2 (network, broadcast) = 352 addresses; smallest power of two >= that is 2^9 = 512 -> /23 (mask 255.255.254.0, wildcard 0.0.1.255). Gateway 10.50.20.1 (first usable), broadcast 10.50.21.255. Utilization 350/510 = 68.6%.",
+      "references": [
+        "RFC 950",
+        "RFC 1878"
+      ]
+    },
+    {
+      "domain": "VLSM",
+      "subject": "MAA-SCANNERS",
+      "decision": "10.50.22.0/24",
+      "justification": "150 hosts + 2 (network, broadcast) = 152 addresses; smallest power of two >= that is 2^8 = 256 -> /24 (mask 255.255.255.0, wildcard 0.0.0.255). Gateway 10.50.22.1 (first usable), broadcast 10.50.22.255. Utilization 150/254 = 59.1%.",
+      "references": [
+        "RFC 950",
+        "RFC 1878"
+      ]
+    },
+    {
+      "domain": "VLSM",
+      "subject": "MAA-USERS",
+      "decision": "10.50.23.0/25",
+      "justification": "80 hosts + 2 (network, broadcast) = 82 addresses; smallest power of two >= that is 2^7 = 128 -> /25 (mask 255.255.255.128, wildcard 0.0.0.127). Gateway 10.50.23.1 (first usable), broadcast 10.50.23.127. Utilization 80/126 = 63.5%.",
+      "references": [
+        "RFC 950",
+        "RFC 1878"
+      ]
+    },
+    {
+      "domain": "VLSM",
+      "subject": "MAA-MGMT",
+      "decision": "10.50.23.128/27",
+      "justification": "20 hosts + 2 (network, broadcast) = 22 addresses; smallest power of two >= that is 2^5 = 32 -> /27 (mask 255.255.255.224, wildcard 0.0.0.31). Gateway 10.50.23.129 (first usable), broadcast 10.50.23.159. Utilization 20/30 = 66.7%.",
+      "references": [
+        "RFC 950",
+        "RFC 1878"
+      ]
+    },
+    {
+      "domain": "VLSM",
+      "subject": "DEL-MAA-WAN-P2P",
+      "decision": "10.50.23.160/31",
+      "justification": "Point-to-point link: RFC 3021 /31 uses both addresses as hosts (no network/broadcast needed on a 2-node link), saving 50% vs a /30.",
+      "references": [
+        "RFC 3021"
+      ]
+    },
+    {
+      "domain": "VLSM",
+      "subject": "LO-MAA-RTR1",
+      "decision": "10.50.23.162/32",
+      "justification": "Router loopback / router-ID: a /32 host route is stable and always up.",
+      "references": [
+        "RFC 2328 s.C.1"
+      ]
+    },
+    {
+      "domain": "VLSM",
+      "subject": "site CHENNAI 10.50.20.0/22",
+      "decision": "6 subnets, 931 addresses",
+      "justification": "Requests were sorted by required block size (largest first) and placed sequentially on their natural bit boundaries, which guarantees zero overlap and no fragmentation. 931 of 1024 addresses consumed (90.9% of the block); host efficiency 603/923 usable = 65.3%. Remaining 93 addresses are contiguous at the top of the block for growth.",
+      "references": [
+        "RFC 1878",
+        "RFC 4632",
+        "RFC 1918"
+      ]
+    },
+    {
+      "domain": "L3 Routing",
+      "subject": "Interior gateway protocol",
+      "decision": "OSPFv2 multi-area",
+      "justification": "Design spans 4 geographically separate sites. Each remote site gets its own area (DELHI=Area 0, MUMBAI=Area 1, BENGALURU=Area 2, CHENNAI=Area 3) attached to backbone Area 0 at DELHI. This isolates routing domains: a flapping metro/WAN link only triggers SPF inside its own area, while other areas receive a single Type-3 summary LSA from the ABR. Combined with per-site summary blocks this keeps LSDB size and SPF cost bounded as sites grow.",
+      "references": [
+        "RFC 2328 s.3",
+        "RFC 3101"
+      ]
+    },
+    {
+      "domain": "L3 Routing",
+      "subject": "Route summarization",
+      "decision": "ABR 'area range' per site block",
+      "justification": "Hierarchical VLSM gave every site one contiguous power-of-two block, so the ABR advertises exactly one summary per area instead of every VLAN. Summaries hide internal flaps from the rest of the network and shrink every routing table.",
+      "references": [
+        "RFC 4632",
+        "RFC 2328 s.12.4.3"
+      ]
+    },
+    {
+      "domain": "L3 Routing",
+      "subject": "Cloud boundary (AWS-VPC-MUMBAI)",
+      "decision": "eBGP AS65050 <-> AS64512 over IPsec",
+      "justification": "The cloud VPC is a separate administrative/routing domain; OSPF must not extend into a provider's network. eBGP gives policy control (prefix-lists, AS-path) and is what cloud VPN gateways speak natively. Only the enterprise aggregate is advertised (anchored with a Null0 route so it is always in the RIB), and only the VPC CIDR 10.100.0.0/16 is accepted. Private ASNs from RFC 6996 are used.",
+      "references": [
+        "RFC 4271",
+        "RFC 6996",
+        "RFC 4301"
+      ]
+    },
+    {
+      "domain": "L1 Media",
+      "subject": "DEL-BOM-WAN",
+      "decision": "Carrier-leased circuit",
+      "justification": "At 1400 km no un-amplified 10G single-mode optic closes the power budget (10G-ZR tops out at 80 km), and private dark fiber with DWDM amplification is not cost-justified. A carrier circuit is used, with a short OS2 1000BASE-LX SFP handoff at the carrier NID. Expected one-way delay ~8.918 ms (fiber route x1.3).",
+      "references": [
+        "MEF 6.2",
+        "ITU-T G.652.D"
+      ]
+    },
+    {
+      "domain": "L1 Media",
+      "subject": "DEL-BLR-WAN",
+      "decision": "Carrier-leased circuit",
+      "justification": "At 2150 km no un-amplified 10G single-mode optic closes the power budget (10G-ZR tops out at 80 km), and private dark fiber with DWDM amplification is not cost-justified. A carrier circuit is used, with a short OS2 1000BASE-LX SFP handoff at the carrier NID. Expected one-way delay ~13.696 ms (fiber route x1.3).",
+      "references": [
+        "MEF 6.2",
+        "ITU-T G.652.D"
+      ]
+    },
+    {
+      "domain": "L1 Media",
+      "subject": "DEL-MAA-WAN",
+      "decision": "Carrier-leased circuit",
+      "justification": "At 2200 km no un-amplified 10G single-mode optic closes the power budget (10G-ZR tops out at 80 km), and private dark fiber with DWDM amplification is not cost-justified. A carrier circuit is used, with a short OS2 1000BASE-LX SFP handoff at the carrier NID. Expected one-way delay ~14.014 ms (fiber route x1.3).",
+      "references": [
+        "MEF 6.2",
+        "ITU-T G.652.D"
+      ]
+    },
+    {
+      "domain": "Security",
+      "subject": "Cloud VPN",
+      "decision": "IKEv2 + IPsec VTI (AES-256, SHA-256, DH14, PFS)",
+      "justification": "Traffic to AWS-VPC-MUMBAI crosses the public Internet, so it is encrypted in an IPsec tunnel. A route-based VTI (instead of a crypto-map) lets eBGP run over the tunnel and fail over dynamically. TCP MSS is clamped to 1379 bytes so ESP + outer-IP tunnel overhead never fragments 1500-byte packets.",
+      "references": [
+        "RFC 7296",
+        "RFC 4301",
+        "RFC 4303"
+      ]
+    },
+    {
+      "domain": "Security",
+      "subject": "ACL IOT-SEGMENT",
+      "decision": "Extended ACL in on VLAN 30",
+      "justification": "Applied inbound on the VLAN 30 gateway interface, i.e. it filters traffic sourced from hosts in that VLAN. 6 entries, most specific first, ending in an explicit deny so denied flows are logged. Wildcard masks are computed bitwise from each subnet prefix (wildcard = ~mask & 0xFFFFFFFF).",
+      "references": [
+        "Cisco IOS ACL reference"
+      ]
+    }
+  ]
+}

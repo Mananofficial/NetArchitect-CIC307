@@ -1,0 +1,33 @@
+[
+  {
+    "action": "permit",
+    "proto": "ip",
+    "src": "NET-MGMT",
+    "dst": "any",
+    "remark": "mgmt hosts"
+  },
+  {
+    "action": "permit",
+    "proto": "tcp",
+    "src": "SERVERS",
+    "dst": "any",
+    "dport": 22,
+    "remark": "jump host SSH"
+  },
+  {
+    "action": "permit",
+    "proto": "udp",
+    "src": "SERVERS",
+    "dst": "any",
+    "dport": 161,
+    "remark": "SNMP poller"
+  },
+  {
+    "action": "deny",
+    "proto": "ip",
+    "src": "any",
+    "dst": "any",
+    "remark": "everything else",
+    "log": true
+  }
+]

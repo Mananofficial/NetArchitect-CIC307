@@ -1,0 +1,660 @@
+{
+  "name": "Campus LAN - 3 buildings, 1,600 endpoints",
+  "profile": "campus_lan",
+  "topology": "Collapsed core (2-tier: core/distribution + access)",
+  "routing": {
+    "igp": "OSPF single-area",
+    "areas": {
+      "MAIN-CAMPUS": 0
+    },
+    "ebgp": false,
+    "local_asn": null,
+    "peer_asn": null,
+    "summarize": false,
+    "bfd": false
+  },
+  "site_blocks": {},
+  "media": [
+    {
+      "link": "BLDG-A horizontal drop",
+      "distance_m": 90.0,
+      "media": "Cat6a U/FTP",
+      "transceiver": "10GBASE-T (RJ45)",
+      "standard": "IEEE 802.3an",
+      "wavelength_nm": null,
+      "lanes": 1,
+      "bandwidth_gbps": 1.0,
+      "loss_db": null,
+      "budget_db": null,
+      "margin_db": null,
+      "attenuator_db": 0,
+      "latency_ms": 0.0005,
+      "notes": []
+    },
+    {
+      "link": "CORE-SW1 <-> BLDG-A uplink",
+      "distance_m": 45.0,
+      "media": "Cat6a U/FTP",
+      "transceiver": "10GBASE-T (RJ45)",
+      "standard": "IEEE 802.3an",
+      "wavelength_nm": null,
+      "lanes": 1,
+      "bandwidth_gbps": 10.0,
+      "loss_db": null,
+      "budget_db": null,
+      "margin_db": null,
+      "attenuator_db": 0,
+      "latency_ms": 0.0002,
+      "notes": []
+    },
+    {
+      "link": "BLDG-B horizontal drop",
+      "distance_m": 95.0,
+      "media": "Cat6a U/FTP",
+      "transceiver": "10GBASE-T (RJ45)",
+      "standard": "IEEE 802.3an",
+      "wavelength_nm": null,
+      "lanes": 1,
+      "bandwidth_gbps": 1.0,
+      "loss_db": null,
+      "budget_db": null,
+      "margin_db": null,
+      "attenuator_db": 0,
+      "latency_ms": 0.0005,
+      "notes": []
+    },
+    {
+      "link": "CORE-SW1 <-> BLDG-B uplink",
+      "distance_m": 180.0,
+      "media": "OM4 MMF (50/125 um)",
+      "transceiver": "10GBASE-SR SFP+",
+      "standard": "IEEE 802.3ae cl.52",
+      "wavelength_nm": 850,
+      "lanes": 2,
+      "bandwidth_gbps": 20.0,
+      "loss_db": 1.54,
+      "budget_db": 2.9,
+      "margin_db": 1.36,
+      "attenuator_db": 0,
+      "latency_ms": 0.0009,
+      "notes": [
+        "2 x 10G members in an LACP bundle"
+      ]
+    },
+    {
+      "link": "BLDG-C horizontal drop",
+      "distance_m": 100.0,
+      "media": "Cat6a U/FTP",
+      "transceiver": "10GBASE-T (RJ45)",
+      "standard": "IEEE 802.3an",
+      "wavelength_nm": null,
+      "lanes": 1,
+      "bandwidth_gbps": 1.0,
+      "loss_db": null,
+      "budget_db": null,
+      "margin_db": null,
+      "attenuator_db": 0,
+      "latency_ms": 0.0005,
+      "notes": []
+    },
+    {
+      "link": "CORE-SW1 <-> BLDG-C uplink",
+      "distance_m": 340.0,
+      "media": "OM4 MMF (50/125 um)",
+      "transceiver": "10GBASE-SR SFP+",
+      "standard": "IEEE 802.3ae cl.52",
+      "wavelength_nm": 850,
+      "lanes": 2,
+      "bandwidth_gbps": 20.0,
+      "loss_db": 2.02,
+      "budget_db": 2.9,
+      "margin_db": 0.88,
+      "attenuator_db": 0,
+      "latency_ms": 0.0017,
+      "notes": [
+        "2 x 10G members in an LACP bundle"
+      ]
+    },
+    {
+      "link": "CORE-SW1 <-> EDGE-RTR1",
+      "distance_m": 15.0,
+      "media": "Cat6a U/FTP",
+      "transceiver": "10GBASE-T (RJ45)",
+      "standard": "IEEE 802.3an",
+      "wavelength_nm": null,
+      "lanes": 1,
+      "bandwidth_gbps": 10.0,
+      "loss_db": null,
+      "budget_db": null,
+      "margin_db": null,
+      "attenuator_db": 0,
+      "latency_ms": 0.0001,
+      "notes": []
+    }
+  ],
+  "subnets": [
+    {
+      "name": "STAFF-A",
+      "site": null,
+      "vlan": 10,
+      "role": "data",
+      "cidr": "10.10.0.0/23",
+      "mask": "255.255.254.0",
+      "wildcard": "0.0.1.255",
+      "gateway": "10.10.0.1",
+      "first_host": "10.10.0.1",
+      "last_host": "10.10.1.254",
+      "broadcast": "10.10.1.255",
+      "hosts_requested": 480,
+      "usable": 510,
+      "utilization_pct": 94.1
+    },
+    {
+      "name": "STAFF-B",
+      "site": null,
+      "vlan": 11,
+      "role": "data",
+      "cidr": "10.10.2.0/23",
+      "mask": "255.255.254.0",
+      "wildcard": "0.0.1.255",
+      "gateway": "10.10.2.1",
+      "first_host": "10.10.2.1",
+      "last_host": "10.10.3.254",
+      "broadcast": "10.10.3.255",
+      "hosts_requested": 380,
+      "usable": 510,
+      "utilization_pct": 74.5
+    },
+    {
+      "name": "STAFF-C",
+      "site": null,
+      "vlan": 12,
+      "role": "data",
+      "cidr": "10.10.4.0/23",
+      "mask": "255.255.254.0",
+      "wildcard": "0.0.1.255",
+      "gateway": "10.10.4.1",
+      "first_host": "10.10.4.1",
+      "last_host": "10.10.5.254",
+      "broadcast": "10.10.5.255",
+      "hosts_requested": 300,
+      "usable": 510,
+      "utilization_pct": 58.8
+    },
+    {
+      "name": "VOICE",
+      "site": null,
+      "vlan": 20,
+      "role": "voice",
+      "cidr": "10.10.6.0/23",
+      "mask": "255.255.254.0",
+      "wildcard": "0.0.1.255",
+      "gateway": "10.10.6.1",
+      "first_host": "10.10.6.1",
+      "last_host": "10.10.7.254",
+      "broadcast": "10.10.7.255",
+      "hosts_requested": 300,
+      "usable": 510,
+      "utilization_pct": 58.8
+    },
+    {
+      "name": "WIFI-CORP",
+      "site": null,
+      "vlan": 30,
+      "role": "wireless",
+      "cidr": "10.10.8.0/23",
+      "mask": "255.255.254.0",
+      "wildcard": "0.0.1.255",
+      "gateway": "10.10.8.1",
+      "first_host": "10.10.8.1",
+      "last_host": "10.10.9.254",
+      "broadcast": "10.10.9.255",
+      "hosts_requested": 400,
+      "usable": 510,
+      "utilization_pct": 78.4
+    },
+    {
+      "name": "GUEST-WIFI",
+      "site": null,
+      "vlan": 40,
+      "role": "guest",
+      "cidr": "10.10.10.0/24",
+      "mask": "255.255.255.0",
+      "wildcard": "0.0.0.255",
+      "gateway": "10.10.10.1",
+      "first_host": "10.10.10.1",
+      "last_host": "10.10.10.254",
+      "broadcast": "10.10.10.255",
+      "hosts_requested": 250,
+      "usable": 254,
+      "utilization_pct": 98.4
+    },
+    {
+      "name": "AP-MGMT",
+      "site": null,
+      "vlan": 50,
+      "role": "ap",
+      "cidr": "10.10.11.0/25",
+      "mask": "255.255.255.128",
+      "wildcard": "0.0.0.127",
+      "gateway": "10.10.11.1",
+      "first_host": "10.10.11.1",
+      "last_host": "10.10.11.126",
+      "broadcast": "10.10.11.127",
+      "hosts_requested": 90,
+      "usable": 126,
+      "utilization_pct": 71.4
+    },
+    {
+      "name": "SERVERS",
+      "site": null,
+      "vlan": 60,
+      "role": "servers",
+      "cidr": "10.10.11.128/26",
+      "mask": "255.255.255.192",
+      "wildcard": "0.0.0.63",
+      "gateway": "10.10.11.129",
+      "first_host": "10.10.11.129",
+      "last_host": "10.10.11.190",
+      "broadcast": "10.10.11.191",
+      "hosts_requested": 40,
+      "usable": 62,
+      "utilization_pct": 64.5
+    },
+    {
+      "name": "NET-MGMT",
+      "site": null,
+      "vlan": 99,
+      "role": "mgmt",
+      "cidr": "10.10.11.192/27",
+      "mask": "255.255.255.224",
+      "wildcard": "0.0.0.31",
+      "gateway": "10.10.11.193",
+      "first_host": "10.10.11.193",
+      "last_host": "10.10.11.222",
+      "broadcast": "10.10.11.223",
+      "hosts_requested": 24,
+      "usable": 30,
+      "utilization_pct": 80.0
+    },
+    {
+      "name": "CORE-EDGE-P2P",
+      "site": null,
+      "vlan": null,
+      "role": "p2p",
+      "cidr": "10.10.11.224/31",
+      "mask": "255.255.255.254",
+      "wildcard": "0.0.0.1",
+      "gateway": "10.10.11.224",
+      "first_host": "10.10.11.224",
+      "last_host": "10.10.11.225",
+      "broadcast": null,
+      "hosts_requested": 2,
+      "usable": 2,
+      "utilization_pct": 100.0
+    },
+    {
+      "name": "LO-CORE-SW1",
+      "site": null,
+      "vlan": null,
+      "role": "loopback",
+      "cidr": "10.10.11.226/32",
+      "mask": "255.255.255.255",
+      "wildcard": "0.0.0.0",
+      "gateway": "10.10.11.226",
+      "first_host": "10.10.11.226",
+      "last_host": "10.10.11.226",
+      "broadcast": null,
+      "hosts_requested": 1,
+      "usable": 1,
+      "utilization_pct": 100.0
+    },
+    {
+      "name": "LO-EDGE-RTR1",
+      "site": null,
+      "vlan": null,
+      "role": "loopback",
+      "cidr": "10.10.11.227/32",
+      "mask": "255.255.255.255",
+      "wildcard": "0.0.0.0",
+      "gateway": "10.10.11.227",
+      "first_host": "10.10.11.227",
+      "last_host": "10.10.11.227",
+      "broadcast": null,
+      "hosts_requested": 1,
+      "usable": 1,
+      "utilization_pct": 100.0
+    }
+  ],
+  "latency": [],
+  "warnings": [],
+  "rationale": [
+    {
+      "domain": "Topology",
+      "subject": "Profile 'campus_lan'",
+      "decision": "Collapsed core (2-tier: core/distribution + access)",
+      "justification": "3 buildings and 1600 endpoints on one campus: a separate distribution layer would add a switch pair per building without improving fault isolation. The L3 core switch acts as distribution, terminating every VLAN's SVI, while access switches stay pure L2 with RSTP.",
+      "references": [
+        "Cisco SAFE/Campus design guides"
+      ]
+    },
+    {
+      "domain": "L1 Media",
+      "subject": "BLDG-A horizontal drop",
+      "decision": "Cat6a / 10GBASE-T",
+      "justification": "Run of 90 m is within the 100 m 10GBASE-T channel limit (90 m permanent link + 10 m cords). Cat6a's 500 MHz rating supports 10 Gb/s over the full length and carries IEEE 802.3bt PoE (up to 90 W) for APs, phones and cameras; fiber would add transceiver cost with no reach benefit.",
+      "references": [
+        "IEEE 802.3an",
+        "IEEE 802.3bt",
+        "ANSI/TIA-568.2-D"
+      ]
+    },
+    {
+      "domain": "L1 Media",
+      "subject": "CORE-SW1 <-> BLDG-A uplink",
+      "decision": "Cat6a / 10GBASE-T",
+      "justification": "Run of 45 m is within the 100 m 10GBASE-T channel limit (90 m permanent link + 10 m cords). Cat6a's 500 MHz rating supports 10 Gb/s over the full length and carries IEEE 802.3bt PoE (up to 90 W) for APs, phones and cameras; fiber would add transceiver cost with no reach benefit.",
+      "references": [
+        "IEEE 802.3an",
+        "IEEE 802.3bt",
+        "ANSI/TIA-568.2-D"
+      ]
+    },
+    {
+      "domain": "Density",
+      "subject": "BLDG-A",
+      "decision": "14 x 48-port access switches",
+      "justification": "650 endpoints / 48 ports = 14 switches (2 stack(s); StackWise max 9 members). 30 PoE APs x 30 W (IEEE 802.3at Class 4) = 900 W PoE budget, so PoE+ capable access switches are required; IP phones share the PC port via the voice VLAN.",
+      "references": [
+        "IEEE 802.3at",
+        "IEEE 802.3bt"
+      ]
+    },
+    {
+      "domain": "L1 Media",
+      "subject": "BLDG-B horizontal drop",
+      "decision": "Cat6a / 10GBASE-T",
+      "justification": "Run of 95 m is within the 100 m 10GBASE-T channel limit (90 m permanent link + 10 m cords). Cat6a's 500 MHz rating supports 10 Gb/s over the full length and carries IEEE 802.3bt PoE (up to 90 W) for APs, phones and cameras; fiber would add transceiver cost with no reach benefit.",
+      "references": [
+        "IEEE 802.3an",
+        "IEEE 802.3bt",
+        "ANSI/TIA-568.2-D"
+      ]
+    },
+    {
+      "domain": "L1 Media",
+      "subject": "CORE-SW1 <-> BLDG-B uplink",
+      "decision": "OM4 MMF / 10GBASE-SR",
+      "justification": "Run of 180 m exceeds the 100 m copper limit (IEEE 802.3an) but is within the 400 m reach of 10GBASE-SR on OM4. At 850 nm the low-cost VCSEL source is limited by modal dispersion, not loss; OM4's 4700 MHz*km effective modal bandwidth sustains 10 Gb/s to 400 m. Channel loss 1.54 dB (0.180 km x 3.0 dB/km + 2 x 0.5 dB connectors) <= 2.9 dB SR budget.",
+      "references": [
+        "IEEE 802.3ae",
+        "TIA-492AAAD (OM4)",
+        "TIA-568.3-D"
+      ]
+    },
+    {
+      "domain": "L2 Bundling",
+      "subject": "CORE-SW1 <-> BLDG-B uplink",
+      "decision": "LACP 2 x 10G",
+      "justification": "Required bandwidth 20 Gb/s exceeds a single 10G lane; ceil(20/10) = 2 member links are bundled with LACP so traffic is hashed across them and a member failure only reduces capacity.",
+      "references": [
+        "IEEE 802.1AX"
+      ]
+    },
+    {
+      "domain": "Density",
+      "subject": "BLDG-B",
+      "decision": "11 x 48-port access switches",
+      "justification": "520 endpoints / 48 ports = 11 switches (2 stack(s); StackWise max 9 members). 30 PoE APs x 30 W (IEEE 802.3at Class 4) = 900 W PoE budget, so PoE+ capable access switches are required; IP phones share the PC port via the voice VLAN.",
+      "references": [
+        "IEEE 802.3at",
+        "IEEE 802.3bt"
+      ]
+    },
+    {
+      "domain": "L1 Media",
+      "subject": "BLDG-C horizontal drop",
+      "decision": "Cat6a / 10GBASE-T",
+      "justification": "Run of 100 m is within the 100 m 10GBASE-T channel limit (90 m permanent link + 10 m cords). Cat6a's 500 MHz rating supports 10 Gb/s over the full length and carries IEEE 802.3bt PoE (up to 90 W) for APs, phones and cameras; fiber would add transceiver cost with no reach benefit.",
+      "references": [
+        "IEEE 802.3an",
+        "IEEE 802.3bt",
+        "ANSI/TIA-568.2-D"
+      ]
+    },
+    {
+      "domain": "L1 Media",
+      "subject": "CORE-SW1 <-> BLDG-C uplink",
+      "decision": "OM4 MMF / 10GBASE-SR",
+      "justification": "Run of 340 m exceeds the 100 m copper limit (IEEE 802.3an) but is within the 400 m reach of 10GBASE-SR on OM4. At 850 nm the low-cost VCSEL source is limited by modal dispersion, not loss; OM4's 4700 MHz*km effective modal bandwidth sustains 10 Gb/s to 400 m. Channel loss 2.02 dB (0.340 km x 3.0 dB/km + 2 x 0.5 dB connectors) <= 2.9 dB SR budget.",
+      "references": [
+        "IEEE 802.3ae",
+        "TIA-492AAAD (OM4)",
+        "TIA-568.3-D"
+      ]
+    },
+    {
+      "domain": "L2 Bundling",
+      "subject": "CORE-SW1 <-> BLDG-C uplink",
+      "decision": "LACP 2 x 10G",
+      "justification": "Required bandwidth 20 Gb/s exceeds a single 10G lane; ceil(20/10) = 2 member links are bundled with LACP so traffic is hashed across them and a member failure only reduces capacity.",
+      "references": [
+        "IEEE 802.1AX"
+      ]
+    },
+    {
+      "domain": "Density",
+      "subject": "BLDG-C",
+      "decision": "9 x 48-port access switches",
+      "justification": "430 endpoints / 48 ports = 9 switches (1 stack(s); StackWise max 9 members). 25 PoE APs x 30 W (IEEE 802.3at Class 4) = 750 W PoE budget, so PoE+ capable access switches are required; IP phones share the PC port via the voice VLAN.",
+      "references": [
+        "IEEE 802.3at",
+        "IEEE 802.3bt"
+      ]
+    },
+    {
+      "domain": "L1 Media",
+      "subject": "CORE-SW1 <-> EDGE-RTR1",
+      "decision": "Cat6a / 10GBASE-T",
+      "justification": "Run of 15 m is within the 100 m 10GBASE-T channel limit (90 m permanent link + 10 m cords). Cat6a's 500 MHz rating supports 10 Gb/s over the full length and carries IEEE 802.3bt PoE (up to 90 W) for APs, phones and cameras; fiber would add transceiver cost with no reach benefit.",
+      "references": [
+        "IEEE 802.3an",
+        "IEEE 802.3bt",
+        "ANSI/TIA-568.2-D"
+      ]
+    },
+    {
+      "domain": "VLSM",
+      "subject": "STAFF-A",
+      "decision": "10.10.0.0/23",
+      "justification": "480 hosts + 2 (network, broadcast) = 482 addresses; smallest power of two >= that is 2^9 = 512 -> /23 (mask 255.255.254.0, wildcard 0.0.1.255). Gateway 10.10.0.1 (first usable), broadcast 10.10.1.255. Utilization 480/510 = 94.1%.",
+      "references": [
+        "RFC 950",
+        "RFC 1878"
+      ]
+    },
+    {
+      "domain": "VLSM",
+      "subject": "STAFF-B",
+      "decision": "10.10.2.0/23",
+      "justification": "380 hosts + 2 (network, broadcast) = 382 addresses; smallest power of two >= that is 2^9 = 512 -> /23 (mask 255.255.254.0, wildcard 0.0.1.255). Gateway 10.10.2.1 (first usable), broadcast 10.10.3.255. Utilization 380/510 = 74.5%.",
+      "references": [
+        "RFC 950",
+        "RFC 1878"
+      ]
+    },
+    {
+      "domain": "VLSM",
+      "subject": "STAFF-C",
+      "decision": "10.10.4.0/23",
+      "justification": "300 hosts + 2 (network, broadcast) = 302 addresses; smallest power of two >= that is 2^9 = 512 -> /23 (mask 255.255.254.0, wildcard 0.0.1.255). Gateway 10.10.4.1 (first usable), broadcast 10.10.5.255. Utilization 300/510 = 58.8%.",
+      "references": [
+        "RFC 950",
+        "RFC 1878"
+      ]
+    },
+    {
+      "domain": "VLSM",
+      "subject": "VOICE",
+      "decision": "10.10.6.0/23",
+      "justification": "300 hosts + 2 (network, broadcast) = 302 addresses; smallest power of two >= that is 2^9 = 512 -> /23 (mask 255.255.254.0, wildcard 0.0.1.255). Gateway 10.10.6.1 (first usable), broadcast 10.10.7.255. Utilization 300/510 = 58.8%.",
+      "references": [
+        "RFC 950",
+        "RFC 1878"
+      ]
+    },
+    {
+      "domain": "VLSM",
+      "subject": "WIFI-CORP",
+      "decision": "10.10.8.0/23",
+      "justification": "400 hosts + 2 (network, broadcast) = 402 addresses; smallest power of two >= that is 2^9 = 512 -> /23 (mask 255.255.254.0, wildcard 0.0.1.255). Gateway 10.10.8.1 (first usable), broadcast 10.10.9.255. Utilization 400/510 = 78.4%.",
+      "references": [
+        "RFC 950",
+        "RFC 1878"
+      ]
+    },
+    {
+      "domain": "VLSM",
+      "subject": "GUEST-WIFI",
+      "decision": "10.10.10.0/24",
+      "justification": "250 hosts + 2 (network, broadcast) = 252 addresses; smallest power of two >= that is 2^8 = 256 -> /24 (mask 255.255.255.0, wildcard 0.0.0.255). Gateway 10.10.10.1 (first usable), broadcast 10.10.10.255. Utilization 250/254 = 98.4%.",
+      "references": [
+        "RFC 950",
+        "RFC 1878"
+      ]
+    },
+    {
+      "domain": "VLSM",
+      "subject": "AP-MGMT",
+      "decision": "10.10.11.0/25",
+      "justification": "90 hosts + 2 (network, broadcast) = 92 addresses; smallest power of two >= that is 2^7 = 128 -> /25 (mask 255.255.255.128, wildcard 0.0.0.127). Gateway 10.10.11.1 (first usable), broadcast 10.10.11.127. Utilization 90/126 = 71.4%.",
+      "references": [
+        "RFC 950",
+        "RFC 1878"
+      ]
+    },
+    {
+      "domain": "VLSM",
+      "subject": "SERVERS",
+      "decision": "10.10.11.128/26",
+      "justification": "40 hosts + 2 (network, broadcast) = 42 addresses; smallest power of two >= that is 2^6 = 64 -> /26 (mask 255.255.255.192, wildcard 0.0.0.63). Gateway 10.10.11.129 (first usable), broadcast 10.10.11.191. Utilization 40/62 = 64.5%.",
+      "references": [
+        "RFC 950",
+        "RFC 1878"
+      ]
+    },
+    {
+      "domain": "VLSM",
+      "subject": "NET-MGMT",
+      "decision": "10.10.11.192/27",
+      "justification": "24 hosts + 2 (network, broadcast) = 26 addresses; smallest power of two >= that is 2^5 = 32 -> /27 (mask 255.255.255.224, wildcard 0.0.0.31). Gateway 10.10.11.193 (first usable), broadcast 10.10.11.223. Utilization 24/30 = 80.0%.",
+      "references": [
+        "RFC 950",
+        "RFC 1878"
+      ]
+    },
+    {
+      "domain": "VLSM",
+      "subject": "CORE-EDGE-P2P",
+      "decision": "10.10.11.224/31",
+      "justification": "Point-to-point link: RFC 3021 /31 uses both addresses as hosts (no network/broadcast needed on a 2-node link), saving 50% vs a /30.",
+      "references": [
+        "RFC 3021"
+      ]
+    },
+    {
+      "domain": "VLSM",
+      "subject": "LO-CORE-SW1",
+      "decision": "10.10.11.226/32",
+      "justification": "Router loopback / router-ID: a /32 host route is stable and always up.",
+      "references": [
+        "RFC 2328 s.C.1"
+      ]
+    },
+    {
+      "domain": "VLSM",
+      "subject": "LO-EDGE-RTR1",
+      "decision": "10.10.11.227/32",
+      "justification": "Router loopback / router-ID: a /32 host route is stable and always up.",
+      "references": [
+        "RFC 2328 s.C.1"
+      ]
+    },
+    {
+      "domain": "VLSM",
+      "subject": "campus root 10.10.0.0/16",
+      "decision": "12 subnets, 3044 addresses",
+      "justification": "Requests were sorted by required block size (largest first) and placed sequentially on their natural bit boundaries, which guarantees zero overlap and no fragmentation. 3044 of 65536 addresses consumed (4.6% of the block); host efficiency 2268/3026 usable = 75.0%. Remaining 62492 addresses are contiguous at the top of the block for growth.",
+      "references": [
+        "RFC 1878",
+        "RFC 4632",
+        "RFC 1918"
+      ]
+    },
+    {
+      "domain": "L3 Routing",
+      "subject": "Interior gateway protocol",
+      "decision": "OSPFv2 Area 0 (single area)",
+      "justification": "One site / one autonomous system with 12 subnets (< 50). A single backbone area keeps every router's LSDB identical and small, so SPF (Dijkstra) runs in milliseconds and link-state flooding gives sub-second convergence after a failure. Multi-area design would add ABR complexity with no scaling benefit at this size; distance-vector protocols (RIP) were rejected for slow, hop-count-limited convergence.",
+      "references": [
+        "RFC 2328"
+      ]
+    },
+    {
+      "domain": "L2 Switching",
+      "subject": "VLAN segmentation",
+      "decision": "802.1Q VLANs [10, 11, 12, 20, 30, 40, 50, 60, 99]",
+      "justification": "Each traffic class (per-building staff data, voice, corporate Wi-Fi, guest, AP management, servers, network management) gets its own VLAN/broadcast domain so broadcast load is contained and inter-VLAN traffic is forced through the L3 core where ACLs apply. Per-building data VLANs keep broadcast domains under ~500 hosts.",
+      "references": [
+        "IEEE 802.1Q"
+      ]
+    },
+    {
+      "domain": "L2 Switching",
+      "subject": "Trunk hardening",
+      "decision": "Pruned trunks, native VLAN 999, DTP off",
+      "justification": "Every trunk carries only the VLANs that exist in that building ('switchport trunk allowed vlan <list>', never 'all'), uses unused native VLAN 999 so untagged frames land nowhere (defeats double-tag VLAN hopping), and disables DTP with 'switchport nonegotiate' so a host cannot negotiate a trunk.",
+      "references": [
+        "IEEE 802.1Q",
+        "Cisco SAFE"
+      ]
+    },
+    {
+      "domain": "L2 Switching",
+      "subject": "Spanning tree",
+      "decision": "Rapid PVST+ (802.1w), core = root bridge",
+      "justification": "Redundant uplinks create L2 loops; RSTP's proposal/agreement handshake converges in < 1 s versus 30-50 s for legacy 802.1D. The core is pinned as root (priority 4096) for every VLAN so traffic follows the designed path; edge ports use PortFast + BPDU Guard so a rogue switch is err-disabled instead of moving the root.",
+      "references": [
+        "IEEE 802.1w",
+        "IEEE 802.1D-2004"
+      ]
+    },
+    {
+      "domain": "L2 Switching",
+      "subject": "Link aggregation",
+      "decision": "LACP (mode active) for multi-lane uplinks",
+      "justification": "Uplinks needing > 10 Gb/s are bundled with LACP so STP sees one logical port (no blocked member) and all members carry traffic.",
+      "references": [
+        "IEEE 802.1AX"
+      ]
+    },
+    {
+      "domain": "Security",
+      "subject": "ACL GUEST-ISOLATION",
+      "decision": "Extended ACL in on VLAN 40",
+      "justification": "Applied inbound on the VLAN 40 gateway interface, i.e. it filters traffic sourced from hosts in that VLAN. 4 entries, most specific first, ending in an explicit deny so denied flows are logged. Wildcard masks are computed bitwise from each subnet prefix (wildcard = ~mask & 0xFFFFFFFF).",
+      "references": [
+        "Cisco IOS ACL reference"
+      ]
+    },
+    {
+      "domain": "Security",
+      "subject": "ACL PROTECT-MGMT",
+      "decision": "Extended ACL out on VLAN 99",
+      "justification": "Applied outbound on the VLAN 99 gateway interface, i.e. it filters traffic destined to hosts in that VLAN. 7 entries, most specific first, ending in an explicit deny so denied flows are logged. Wildcard masks are computed bitwise from each subnet prefix (wildcard = ~mask & 0xFFFFFFFF).",
+      "references": [
+        "Cisco IOS ACL reference"
+      ]
+    }
+  ]
+}

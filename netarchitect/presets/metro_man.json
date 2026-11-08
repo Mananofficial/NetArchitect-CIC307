@@ -1,0 +1,243 @@
+{
+  "name": "Metro MAN - HQ + 2 remote sites + FinTech colo",
+  "profile": "metro_man",
+  "root_prefix": "10.20.0.0/16",
+  "resiliency": "dual-homed",
+  "latency_budget_ms": 5.0,
+  "qos": true,
+  "asn": 65020,
+  "devices": {
+    "router": {
+      "model": "ISR4331 / Router-PT",
+      "lan_if": "GigabitEthernet0/0",
+      "link_ifs": "GigabitEthernet{n}/0"
+    }
+  },
+  "sites": [
+    {
+      "name": "HQ",
+      "role": "hq",
+      "endpoints": 250,
+      "router": "HQ-RTR1",
+      "subnets": [
+        {
+          "name": "HQ-USERS",
+          "vlan": 10,
+          "hosts": 200,
+          "role": "data"
+        },
+        {
+          "name": "HQ-VOICE",
+          "vlan": 20,
+          "hosts": 120,
+          "role": "voice"
+        },
+        {
+          "name": "HQ-SERVERS",
+          "vlan": 30,
+          "hosts": 30,
+          "role": "servers"
+        },
+        {
+          "name": "HQ-MGMT",
+          "vlan": 99,
+          "hosts": 20,
+          "role": "mgmt"
+        }
+      ]
+    },
+    {
+      "name": "REMOTE-A",
+      "role": "branch",
+      "endpoints": 120,
+      "router": "REMA-RTR1",
+      "subnets": [
+        {
+          "name": "REMA-USERS",
+          "vlan": 10,
+          "hosts": 100,
+          "role": "data"
+        },
+        {
+          "name": "REMA-VOICE",
+          "vlan": 20,
+          "hosts": 60,
+          "role": "voice"
+        },
+        {
+          "name": "REMA-MGMT",
+          "vlan": 99,
+          "hosts": 10,
+          "role": "mgmt"
+        }
+      ]
+    },
+    {
+      "name": "REMOTE-B",
+      "role": "branch",
+      "endpoints": 80,
+      "router": "REMB-RTR1",
+      "subnets": [
+        {
+          "name": "REMB-USERS",
+          "vlan": 10,
+          "hosts": 70,
+          "role": "data"
+        },
+        {
+          "name": "REMB-VOICE",
+          "vlan": 20,
+          "hosts": 40,
+          "role": "voice"
+        },
+        {
+          "name": "REMB-MGMT",
+          "vlan": 99,
+          "hosts": 10,
+          "role": "mgmt"
+        }
+      ]
+    },
+    {
+      "name": "COLO",
+      "role": "colo",
+      "area": 0,
+      "endpoints": 0,
+      "router": "COLO-RTR1",
+      "subnets": [
+        {
+          "name": "COLO-TRADING",
+          "vlan": 40,
+          "hosts": 30,
+          "role": "trading"
+        },
+        {
+          "name": "COLO-MGMT",
+          "vlan": 99,
+          "hosts": 10,
+          "role": "mgmt"
+        }
+      ]
+    }
+  ],
+  "links": [
+    {
+      "name": "HQ-REMA-PRIMARY",
+      "a": "HQ",
+      "b": "REMOTE-A",
+      "distance_m": 15000,
+      "bandwidth_gbps": 10,
+      "path": "primary"
+    },
+    {
+      "name": "HQ-REMA-SECONDARY",
+      "a": "HQ",
+      "b": "REMOTE-A",
+      "distance_m": 18000,
+      "bandwidth_gbps": 1,
+      "path": "secondary",
+      "service": "EVPL",
+      "carrier_latency_ms": 0.5
+    },
+    {
+      "name": "HQ-REMB-PRIMARY",
+      "a": "HQ",
+      "b": "REMOTE-B",
+      "distance_m": 35000,
+      "bandwidth_gbps": 10,
+      "path": "primary"
+    },
+    {
+      "name": "HQ-REMB-SECONDARY",
+      "a": "HQ",
+      "b": "REMOTE-B",
+      "distance_m": 38000,
+      "bandwidth_gbps": 1,
+      "path": "secondary",
+      "service": "EVPL",
+      "carrier_latency_ms": 0.5
+    },
+    {
+      "name": "HQ-COLO-PRIMARY",
+      "a": "HQ",
+      "b": "COLO",
+      "distance_m": 22000,
+      "bandwidth_gbps": 10,
+      "path": "primary"
+    },
+    {
+      "name": "HQ-COLO-SECONDARY",
+      "a": "HQ",
+      "b": "COLO",
+      "distance_m": 25000,
+      "bandwidth_gbps": 10,
+      "path": "secondary",
+      "service": "EVPL",
+      "carrier_latency_ms": 0.5
+    }
+  ],
+  "acls": [
+    {
+      "name": "COLO-PROTECT",
+      "apply_vlan": 40,
+      "direction": "out",
+      "site": "COLO",
+      "rules": [
+        {
+          "action": "permit",
+          "proto": "tcp",
+          "src": "HQ-USERS",
+          "dst": "COLO-TRADING",
+          "dport": 443,
+          "remark": "trading UI"
+        },
+        {
+          "action": "permit",
+          "proto": "ip",
+          "src": "HQ-SERVERS",
+          "dst": "COLO-TRADING",
+          "remark": "app/DB replication"
+        },
+        {
+          "action": "permit",
+          "proto": "ip",
+          "src": "HQ-MGMT",
+          "dst": "COLO-TRADING",
+          "remark": "NOC"
+        },
+        {
+          "action": "permit",
+          "proto": "tcp",
+          "src": "any",
+          "dst": "COLO-TRADING",
+          "established": true,
+          "remark": "replies to sessions opened by trading servers"
+        },
+        {
+          "action": "permit",
+          "proto": "udp",
+          "src": "any",
+          "dst": "COLO-TRADING",
+          "sport": 123,
+          "remark": "NTP replies (trade timestamping)"
+        },
+        {
+          "action": "permit",
+          "proto": "udp",
+          "src": "HQ-SERVERS",
+          "dst": "COLO-TRADING",
+          "sport": 53,
+          "remark": "DNS replies"
+        },
+        {
+          "action": "deny",
+          "proto": "ip",
+          "src": "any",
+          "dst": "any",
+          "remark": "default deny",
+          "log": true
+        }
+      ]
+    }
+  ]
+}

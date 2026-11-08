@@ -1,0 +1,65 @@
+{
+  "name": "Custom example - small two-site MAN",
+  "profile": "metro_man",
+  "root_prefix": "172.16.0.0/20",
+  "resiliency": "standard",
+  "asn": 65100,
+  "sites": [
+    {
+      "name": "MAIN",
+      "role": "hq",
+      "endpoints": 120,
+      "router": "MAIN-RTR1",
+      "subnets": [
+        {
+          "name": "MAIN-USERS",
+          "vlan": 10,
+          "hosts": 100,
+          "role": "data"
+        },
+        {
+          "name": "MAIN-MGMT",
+          "vlan": 99,
+          "hosts": 10,
+          "role": "mgmt"
+        }
+      ]
+    },
+    {
+      "name": "PLANT",
+      "role": "branch",
+      "endpoints": 60,
+      "router": "PLANT-RTR1",
+      "subnets": [
+        {
+          "name": "PLANT-USERS",
+          "vlan": 10,
+          "hosts": 40,
+          "role": "data"
+        },
+        {
+          "name": "PLANT-SCADA",
+          "vlan": 50,
+          "hosts": 20,
+          "role": "iot"
+        },
+        {
+          "name": "PLANT-MGMT",
+          "vlan": 99,
+          "hosts": 10,
+          "role": "mgmt"
+        }
+      ]
+    }
+  ],
+  "links": [
+    {
+      "name": "MAIN-PLANT",
+      "a": "MAIN",
+      "b": "PLANT",
+      "distance_m": 8000,
+      "bandwidth_gbps": 10,
+      "path": "primary"
+    }
+  ]
+}

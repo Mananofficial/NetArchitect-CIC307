@@ -1,0 +1,510 @@
+! ===================================================================
+! NetArchitect configuration export - Metro MAN - HQ + 2 remote sites + FinTech colo
+! Profile: metro_man   Root: 10.20.0.0/16
+! Topology: Dual-homed hub-and-spoke MAN
+! Routing: OSPF multi-area
+! Devices: HQ-RTR1, REMA-RTR1, REMB-RTR1, COLO-RTR1
+! ===================================================================
+
+! ######## DEVICE: HQ-RTR1 ########
+! NetArchitect generated configuration - Metro MAN - HQ + 2 remote sites + FinTech colo
+! Device: HQ-RTR1   Platform: ISR4331 / Router-PT
+! Replace every CHANGE-ME secret before production use.
+!
+enable
+configure terminal
+hostname HQ-RTR1
+no ip domain-lookup
+ip domain-name netarchitect.local
+service password-encryption
+enable secret CHANGE-ME-enable
+username netadmin privilege 15 secret CHANGE-ME-admin
+banner motd ^Authorized access only - HQ-RTR1^
+!
+ip dhcp excluded-address 10.20.0.1 10.20.0.10
+ip dhcp pool HQ-USERS
+ network 10.20.0.0 255.255.255.0
+ default-router 10.20.0.1
+ dns-server 10.20.1.138
+!
+ip dhcp excluded-address 10.20.1.1 10.20.1.10
+ip dhcp pool HQ-VOICE
+ network 10.20.1.0 255.255.255.128
+ default-router 10.20.1.1
+ dns-server 10.20.1.138
+!
+class-map match-any VOICE
+ match dscp ef
+class-map match-any TRADING
+ match dscp af41
+ match access-group name TRADING-TRAFFIC
+!
+policy-map METRO-EGRESS-QOS
+ class VOICE
+  priority percent 20
+ class TRADING
+  bandwidth percent 40
+ class class-default
+  fair-queue
+!
+ip access-list extended TRADING-TRAFFIC
+ permit ip any 10.20.4.0 0.0.0.31
+ permit ip 10.20.4.0 0.0.0.31 any
+!
+interface Loopback0
+ ip address 10.20.1.192 255.255.255.255
+!
+interface GigabitEthernet0/0
+ description 802.1Q trunk to site LAN switch
+ no ip address
+ no shutdown
+!
+interface GigabitEthernet0/0.10
+ description HQ-USERS 10.20.0.0/24
+ encapsulation dot1Q 10
+ ip address 10.20.0.1 255.255.255.0
+!
+interface GigabitEthernet0/0.20
+ description HQ-VOICE 10.20.1.0/25
+ encapsulation dot1Q 20
+ ip address 10.20.1.1 255.255.255.128
+!
+interface GigabitEthernet0/0.30
+ description HQ-SERVERS 10.20.1.128/27
+ encapsulation dot1Q 30
+ ip address 10.20.1.129 255.255.255.224
+!
+interface GigabitEthernet0/0.99
+ description HQ-MGMT 10.20.1.160/27
+ encapsulation dot1Q 99
+ ip address 10.20.1.161 255.255.255.224
+!
+interface GigabitEthernet1/0
+ description PRIMARY to REMA-RTR1 - OS2 SMF (9/125 um) / 10GBASE-ER SFP+ / 15 km
+ ip address 10.20.2.208 255.255.255.254
+ ip ospf network point-to-point
+ ip ospf cost 10
+ bfd interval 300 min_rx 300 multiplier 3
+ service-policy output METRO-EGRESS-QOS
+ no shutdown
+!
+interface GigabitEthernet2/0
+ description SECONDARY to REMA-RTR1 - Carrier EVPL (MEF E-Line) / 1000BASE-LX SFP to carrier NID / 18 km
+ ip address 10.20.2.210 255.255.255.254
+ ip ospf network point-to-point
+ ip ospf cost 100
+ bfd interval 300 min_rx 300 multiplier 3
+ service-policy output METRO-EGRESS-QOS
+ no shutdown
+!
+interface GigabitEthernet3/0
+ description PRIMARY to REMB-RTR1 - OS2 SMF (9/125 um) / 10G-ZR SFP+ / 35 km
+ ip address 10.20.3.208 255.255.255.254
+ ip ospf network point-to-point
+ ip ospf cost 10
+ bfd interval 300 min_rx 300 multiplier 3
+ service-policy output METRO-EGRESS-QOS
+ no shutdown
+!
+interface GigabitEthernet4/0
+ description SECONDARY to REMB-RTR1 - Carrier EVPL (MEF E-Line) / 1000BASE-LX SFP to carrier NID / 38 km
+ ip address 10.20.3.210 255.255.255.254
+ ip ospf network point-to-point
+ ip ospf cost 100
+ bfd interval 300 min_rx 300 multiplier 3
+ service-policy output METRO-EGRESS-QOS
+ no shutdown
+!
+interface GigabitEthernet5/0
+ description PRIMARY to COLO-RTR1 - OS2 SMF (9/125 um) / 10GBASE-ER SFP+ / 22 km
+ ip address 10.20.4.48 255.255.255.254
+ ip ospf network point-to-point
+ ip ospf cost 10
+ bfd interval 300 min_rx 300 multiplier 3
+ service-policy output METRO-EGRESS-QOS
+ no shutdown
+!
+interface GigabitEthernet6/0
+ description SECONDARY to COLO-RTR1 - Carrier EVPL (MEF E-Line) / 10GBASE-LR SFP+ to carrier NID / 25 km
+ ip address 10.20.4.50 255.255.255.254
+ ip ospf network point-to-point
+ ip ospf cost 100
+ bfd interval 300 min_rx 300 multiplier 3
+ service-policy output METRO-EGRESS-QOS
+ no shutdown
+!
+router ospf 1
+ router-id 10.20.1.192
+ auto-cost reference-bandwidth 100000
+ passive-interface default
+ no passive-interface GigabitEthernet1/0
+ no passive-interface GigabitEthernet2/0
+ no passive-interface GigabitEthernet3/0
+ no passive-interface GigabitEthernet4/0
+ no passive-interface GigabitEthernet5/0
+ no passive-interface GigabitEthernet6/0
+ network 10.20.0.0 0.0.0.255 area 0
+ network 10.20.1.0 0.0.0.127 area 0
+ network 10.20.1.128 0.0.0.31 area 0
+ network 10.20.1.160 0.0.0.31 area 0
+ network 10.20.1.192 0.0.0.0 area 0
+ network 10.20.2.208 0.0.0.1 area 1
+ network 10.20.2.210 0.0.0.1 area 1
+ network 10.20.3.208 0.0.0.1 area 2
+ network 10.20.3.210 0.0.0.1 area 2
+ network 10.20.4.48 0.0.0.1 area 0
+ network 10.20.4.50 0.0.0.1 area 0
+ area 1 range 10.20.2.0 255.255.255.0
+ area 2 range 10.20.3.0 255.255.255.0
+ bfd all-interfaces
+!
+!
+crypto key generate rsa modulus 2048
+ip ssh version 2
+line con 0
+ logging synchronous
+ login local
+line vty 0 4
+ login local
+ transport input ssh
+!
+end
+write memory
+
+! ######## DEVICE: REMA-RTR1 ########
+! NetArchitect generated configuration - Metro MAN - HQ + 2 remote sites + FinTech colo
+! Device: REMA-RTR1   Platform: ISR4331 / Router-PT
+! Replace every CHANGE-ME secret before production use.
+!
+enable
+configure terminal
+hostname REMA-RTR1
+no ip domain-lookup
+ip domain-name netarchitect.local
+service password-encryption
+enable secret CHANGE-ME-enable
+username netadmin privilege 15 secret CHANGE-ME-admin
+banner motd ^Authorized access only - REMA-RTR1^
+!
+ip dhcp excluded-address 10.20.2.1 10.20.2.10
+ip dhcp pool REMA-USERS
+ network 10.20.2.0 255.255.255.128
+ default-router 10.20.2.1
+ dns-server 10.20.1.138
+!
+ip dhcp excluded-address 10.20.2.129 10.20.2.138
+ip dhcp pool REMA-VOICE
+ network 10.20.2.128 255.255.255.192
+ default-router 10.20.2.129
+ dns-server 10.20.1.138
+!
+class-map match-any VOICE
+ match dscp ef
+class-map match-any TRADING
+ match dscp af41
+ match access-group name TRADING-TRAFFIC
+!
+policy-map METRO-EGRESS-QOS
+ class VOICE
+  priority percent 20
+ class TRADING
+  bandwidth percent 40
+ class class-default
+  fair-queue
+!
+ip access-list extended TRADING-TRAFFIC
+ permit ip any 10.20.4.0 0.0.0.31
+ permit ip 10.20.4.0 0.0.0.31 any
+!
+interface Loopback0
+ ip address 10.20.2.212 255.255.255.255
+!
+interface GigabitEthernet0/0
+ description 802.1Q trunk to site LAN switch
+ no ip address
+ no shutdown
+!
+interface GigabitEthernet0/0.10
+ description REMA-USERS 10.20.2.0/25
+ encapsulation dot1Q 10
+ ip address 10.20.2.1 255.255.255.128
+!
+interface GigabitEthernet0/0.20
+ description REMA-VOICE 10.20.2.128/26
+ encapsulation dot1Q 20
+ ip address 10.20.2.129 255.255.255.192
+!
+interface GigabitEthernet0/0.99
+ description REMA-MGMT 10.20.2.192/28
+ encapsulation dot1Q 99
+ ip address 10.20.2.193 255.255.255.240
+!
+interface GigabitEthernet1/0
+ description PRIMARY to HQ-RTR1 - OS2 SMF (9/125 um) / 10GBASE-ER SFP+ / 15 km
+ ip address 10.20.2.209 255.255.255.254
+ ip ospf network point-to-point
+ ip ospf cost 10
+ bfd interval 300 min_rx 300 multiplier 3
+ service-policy output METRO-EGRESS-QOS
+ no shutdown
+!
+interface GigabitEthernet2/0
+ description SECONDARY to HQ-RTR1 - Carrier EVPL (MEF E-Line) / 1000BASE-LX SFP to carrier NID / 18 km
+ ip address 10.20.2.211 255.255.255.254
+ ip ospf network point-to-point
+ ip ospf cost 100
+ bfd interval 300 min_rx 300 multiplier 3
+ service-policy output METRO-EGRESS-QOS
+ no shutdown
+!
+router ospf 1
+ router-id 10.20.2.212
+ auto-cost reference-bandwidth 100000
+ passive-interface default
+ no passive-interface GigabitEthernet1/0
+ no passive-interface GigabitEthernet2/0
+ network 10.20.2.0 0.0.0.127 area 1
+ network 10.20.2.128 0.0.0.63 area 1
+ network 10.20.2.192 0.0.0.15 area 1
+ network 10.20.2.212 0.0.0.0 area 1
+ network 10.20.2.208 0.0.0.1 area 1
+ network 10.20.2.210 0.0.0.1 area 1
+ bfd all-interfaces
+!
+!
+crypto key generate rsa modulus 2048
+ip ssh version 2
+line con 0
+ logging synchronous
+ login local
+line vty 0 4
+ login local
+ transport input ssh
+!
+end
+write memory
+
+! ######## DEVICE: REMB-RTR1 ########
+! NetArchitect generated configuration - Metro MAN - HQ + 2 remote sites + FinTech colo
+! Device: REMB-RTR1   Platform: ISR4331 / Router-PT
+! Replace every CHANGE-ME secret before production use.
+!
+enable
+configure terminal
+hostname REMB-RTR1
+no ip domain-lookup
+ip domain-name netarchitect.local
+service password-encryption
+enable secret CHANGE-ME-enable
+username netadmin privilege 15 secret CHANGE-ME-admin
+banner motd ^Authorized access only - REMB-RTR1^
+!
+ip dhcp excluded-address 10.20.3.1 10.20.3.10
+ip dhcp pool REMB-USERS
+ network 10.20.3.0 255.255.255.128
+ default-router 10.20.3.1
+ dns-server 10.20.1.138
+!
+ip dhcp excluded-address 10.20.3.129 10.20.3.138
+ip dhcp pool REMB-VOICE
+ network 10.20.3.128 255.255.255.192
+ default-router 10.20.3.129
+ dns-server 10.20.1.138
+!
+class-map match-any VOICE
+ match dscp ef
+class-map match-any TRADING
+ match dscp af41
+ match access-group name TRADING-TRAFFIC
+!
+policy-map METRO-EGRESS-QOS
+ class VOICE
+  priority percent 20
+ class TRADING
+  bandwidth percent 40
+ class class-default
+  fair-queue
+!
+ip access-list extended TRADING-TRAFFIC
+ permit ip any 10.20.4.0 0.0.0.31
+ permit ip 10.20.4.0 0.0.0.31 any
+!
+interface Loopback0
+ ip address 10.20.3.212 255.255.255.255
+!
+interface GigabitEthernet0/0
+ description 802.1Q trunk to site LAN switch
+ no ip address
+ no shutdown
+!
+interface GigabitEthernet0/0.10
+ description REMB-USERS 10.20.3.0/25
+ encapsulation dot1Q 10
+ ip address 10.20.3.1 255.255.255.128
+!
+interface GigabitEthernet0/0.20
+ description REMB-VOICE 10.20.3.128/26
+ encapsulation dot1Q 20
+ ip address 10.20.3.129 255.255.255.192
+!
+interface GigabitEthernet0/0.99
+ description REMB-MGMT 10.20.3.192/28
+ encapsulation dot1Q 99
+ ip address 10.20.3.193 255.255.255.240
+!
+interface GigabitEthernet1/0
+ description PRIMARY to HQ-RTR1 - OS2 SMF (9/125 um) / 10G-ZR SFP+ / 35 km
+ ip address 10.20.3.209 255.255.255.254
+ ip ospf network point-to-point
+ ip ospf cost 10
+ bfd interval 300 min_rx 300 multiplier 3
+ service-policy output METRO-EGRESS-QOS
+ no shutdown
+!
+interface GigabitEthernet2/0
+ description SECONDARY to HQ-RTR1 - Carrier EVPL (MEF E-Line) / 1000BASE-LX SFP to carrier NID / 38 km
+ ip address 10.20.3.211 255.255.255.254
+ ip ospf network point-to-point
+ ip ospf cost 100
+ bfd interval 300 min_rx 300 multiplier 3
+ service-policy output METRO-EGRESS-QOS
+ no shutdown
+!
+router ospf 1
+ router-id 10.20.3.212
+ auto-cost reference-bandwidth 100000
+ passive-interface default
+ no passive-interface GigabitEthernet1/0
+ no passive-interface GigabitEthernet2/0
+ network 10.20.3.0 0.0.0.127 area 2
+ network 10.20.3.128 0.0.0.63 area 2
+ network 10.20.3.192 0.0.0.15 area 2
+ network 10.20.3.212 0.0.0.0 area 2
+ network 10.20.3.208 0.0.0.1 area 2
+ network 10.20.3.210 0.0.0.1 area 2
+ bfd all-interfaces
+!
+!
+crypto key generate rsa modulus 2048
+ip ssh version 2
+line con 0
+ logging synchronous
+ login local
+line vty 0 4
+ login local
+ transport input ssh
+!
+end
+write memory
+
+! ######## DEVICE: COLO-RTR1 ########
+! NetArchitect generated configuration - Metro MAN - HQ + 2 remote sites + FinTech colo
+! Device: COLO-RTR1   Platform: ISR4331 / Router-PT
+! Replace every CHANGE-ME secret before production use.
+!
+enable
+configure terminal
+hostname COLO-RTR1
+no ip domain-lookup
+ip domain-name netarchitect.local
+service password-encryption
+enable secret CHANGE-ME-enable
+username netadmin privilege 15 secret CHANGE-ME-admin
+banner motd ^Authorized access only - COLO-RTR1^
+!
+class-map match-any VOICE
+ match dscp ef
+class-map match-any TRADING
+ match dscp af41
+ match access-group name TRADING-TRAFFIC
+!
+policy-map METRO-EGRESS-QOS
+ class VOICE
+  priority percent 20
+ class TRADING
+  bandwidth percent 40
+ class class-default
+  fair-queue
+!
+ip access-list extended TRADING-TRAFFIC
+ permit ip any 10.20.4.0 0.0.0.31
+ permit ip 10.20.4.0 0.0.0.31 any
+!
+ip access-list extended COLO-PROTECT
+ remark trading UI
+ permit tcp 10.20.0.0 0.0.0.255 10.20.4.0 0.0.0.31 eq 443
+ remark app/DB replication
+ permit ip 10.20.1.128 0.0.0.31 10.20.4.0 0.0.0.31
+ remark NOC
+ permit ip 10.20.1.160 0.0.0.31 10.20.4.0 0.0.0.31
+ remark replies to sessions opened by trading servers
+ permit tcp any 10.20.4.0 0.0.0.31 established
+ remark NTP replies (trade timestamping)
+ permit udp any eq 123 10.20.4.0 0.0.0.31
+ remark DNS replies
+ permit udp 10.20.1.128 0.0.0.31 eq 53 10.20.4.0 0.0.0.31
+ remark default deny
+ deny ip any any log
+!
+interface Loopback0
+ ip address 10.20.4.52 255.255.255.255
+!
+interface GigabitEthernet0/0
+ description 802.1Q trunk to site LAN switch
+ no ip address
+ no shutdown
+!
+interface GigabitEthernet0/0.40
+ description COLO-TRADING 10.20.4.0/27
+ encapsulation dot1Q 40
+ ip address 10.20.4.1 255.255.255.224
+ ip access-group COLO-PROTECT out
+!
+interface GigabitEthernet0/0.99
+ description COLO-MGMT 10.20.4.32/28
+ encapsulation dot1Q 99
+ ip address 10.20.4.33 255.255.255.240
+!
+interface GigabitEthernet1/0
+ description PRIMARY to HQ-RTR1 - OS2 SMF (9/125 um) / 10GBASE-ER SFP+ / 22 km
+ ip address 10.20.4.49 255.255.255.254
+ ip ospf network point-to-point
+ ip ospf cost 10
+ bfd interval 300 min_rx 300 multiplier 3
+ service-policy output METRO-EGRESS-QOS
+ no shutdown
+!
+interface GigabitEthernet2/0
+ description SECONDARY to HQ-RTR1 - Carrier EVPL (MEF E-Line) / 10GBASE-LR SFP+ to carrier NID / 25 km
+ ip address 10.20.4.51 255.255.255.254
+ ip ospf network point-to-point
+ ip ospf cost 100
+ bfd interval 300 min_rx 300 multiplier 3
+ service-policy output METRO-EGRESS-QOS
+ no shutdown
+!
+router ospf 1
+ router-id 10.20.4.52
+ auto-cost reference-bandwidth 100000
+ passive-interface default
+ no passive-interface GigabitEthernet1/0
+ no passive-interface GigabitEthernet2/0
+ network 10.20.4.0 0.0.0.31 area 0
+ network 10.20.4.32 0.0.0.15 area 0
+ network 10.20.4.52 0.0.0.0 area 0
+ network 10.20.4.48 0.0.0.1 area 0
+ network 10.20.4.50 0.0.0.1 area 0
+ bfd all-interfaces
+!
+!
+crypto key generate rsa modulus 2048
+ip ssh version 2
+line con 0
+ logging synchronous
+ login local
+line vty 0 4
+ login local
+ transport input ssh
+!
+end
+write memory

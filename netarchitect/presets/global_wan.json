@@ -1,0 +1,240 @@
+{
+  "name": "Global WAN - 4 cities + Cloud VPC, 2,000 IoT/scanners",
+  "profile": "global_wan",
+  "root_prefix": "10.50.0.0/16",
+  "resiliency": "standard",
+  "asn": 65050,
+  "devices": {
+    "router": {
+      "model": "ISR4331 / CSR1000v (GNS3)",
+      "lan_if": "GigabitEthernet0/0",
+      "link_ifs": "GigabitEthernet{n}/0",
+      "internet_if": "GigabitEthernet9/0"
+    }
+  },
+  "cloud": {
+    "name": "AWS-VPC-MUMBAI",
+    "cidr": "10.100.0.0/16",
+    "asn": 64512,
+    "hub": "DELHI",
+    "peer_public_ip": "198.51.100.10",
+    "local_public_ip": "203.0.113.6",
+    "local_public_mask": "255.255.255.252",
+    "internet_gw": "203.0.113.5",
+    "tunnel_cidr": "169.254.10.0/30",
+    "psk": "CHANGE-ME-PSK"
+  },
+  "sites": [
+    {
+      "name": "DELHI",
+      "role": "hq",
+      "endpoints": 770,
+      "router": "DEL-RTR1",
+      "subnets": [
+        {
+          "name": "DEL-USERS",
+          "vlan": 10,
+          "hosts": 300,
+          "role": "data"
+        },
+        {
+          "name": "DEL-IOT",
+          "vlan": 30,
+          "hosts": 300,
+          "role": "iot"
+        },
+        {
+          "name": "DEL-SCANNERS",
+          "vlan": 40,
+          "hosts": 150,
+          "role": "scanners"
+        },
+        {
+          "name": "DEL-MGMT",
+          "vlan": 99,
+          "hosts": 20,
+          "role": "mgmt"
+        }
+      ]
+    },
+    {
+      "name": "MUMBAI",
+      "role": "branch",
+      "endpoints": 650,
+      "router": "BOM-RTR1",
+      "subnets": [
+        {
+          "name": "BOM-USERS",
+          "vlan": 10,
+          "hosts": 150,
+          "role": "data"
+        },
+        {
+          "name": "BOM-IOT",
+          "vlan": 30,
+          "hosts": 350,
+          "role": "iot"
+        },
+        {
+          "name": "BOM-SCANNERS",
+          "vlan": 40,
+          "hosts": 150,
+          "role": "scanners"
+        },
+        {
+          "name": "BOM-MGMT",
+          "vlan": 99,
+          "hosts": 20,
+          "role": "mgmt"
+        }
+      ]
+    },
+    {
+      "name": "BENGALURU",
+      "role": "branch",
+      "endpoints": 670,
+      "router": "BLR-RTR1",
+      "subnets": [
+        {
+          "name": "BLR-USERS",
+          "vlan": 10,
+          "hosts": 120,
+          "role": "data"
+        },
+        {
+          "name": "BLR-IOT",
+          "vlan": 30,
+          "hosts": 400,
+          "role": "iot"
+        },
+        {
+          "name": "BLR-SCANNERS",
+          "vlan": 40,
+          "hosts": 150,
+          "role": "scanners"
+        },
+        {
+          "name": "BLR-MGMT",
+          "vlan": 99,
+          "hosts": 20,
+          "role": "mgmt"
+        }
+      ]
+    },
+    {
+      "name": "CHENNAI",
+      "role": "branch",
+      "endpoints": 580,
+      "router": "MAA-RTR1",
+      "subnets": [
+        {
+          "name": "MAA-USERS",
+          "vlan": 10,
+          "hosts": 80,
+          "role": "data"
+        },
+        {
+          "name": "MAA-IOT",
+          "vlan": 30,
+          "hosts": 350,
+          "role": "iot"
+        },
+        {
+          "name": "MAA-SCANNERS",
+          "vlan": 40,
+          "hosts": 150,
+          "role": "scanners"
+        },
+        {
+          "name": "MAA-MGMT",
+          "vlan": 99,
+          "hosts": 20,
+          "role": "mgmt"
+        }
+      ]
+    }
+  ],
+  "links": [
+    {
+      "name": "DEL-BOM-WAN",
+      "a": "DELHI",
+      "b": "MUMBAI",
+      "distance_m": 1400000,
+      "bandwidth_gbps": 1,
+      "path": "primary"
+    },
+    {
+      "name": "DEL-BLR-WAN",
+      "a": "DELHI",
+      "b": "BENGALURU",
+      "distance_m": 2150000,
+      "bandwidth_gbps": 1,
+      "path": "primary"
+    },
+    {
+      "name": "DEL-MAA-WAN",
+      "a": "DELHI",
+      "b": "CHENNAI",
+      "distance_m": 2200000,
+      "bandwidth_gbps": 1,
+      "path": "primary"
+    }
+  ],
+  "acls": [
+    {
+      "name": "IOT-SEGMENT",
+      "apply_vlan": 30,
+      "direction": "in",
+      "site": "DELHI",
+      "rules": [
+        {
+          "action": "permit",
+          "proto": "udp",
+          "src": "any",
+          "dst": "any",
+          "dport": 67,
+          "remark": "DHCP"
+        },
+        {
+          "action": "permit",
+          "proto": "udp",
+          "src": "DEL-IOT",
+          "dst": "any",
+          "dport": 53,
+          "remark": "DNS resolution for cloud broker FQDN"
+        },
+        {
+          "action": "permit",
+          "proto": "tcp",
+          "src": "DEL-IOT",
+          "dst": "CLOUD",
+          "dport": 8883,
+          "remark": "MQTT/TLS to cloud broker"
+        },
+        {
+          "action": "permit",
+          "proto": "tcp",
+          "src": "DEL-IOT",
+          "dst": "CLOUD",
+          "dport": 443,
+          "remark": "HTTPS telemetry"
+        },
+        {
+          "action": "deny",
+          "proto": "ip",
+          "src": "DEL-IOT",
+          "dst": "ROOT",
+          "remark": "no lateral movement into enterprise",
+          "log": true
+        },
+        {
+          "action": "deny",
+          "proto": "ip",
+          "src": "any",
+          "dst": "any",
+          "remark": "default deny"
+        }
+      ]
+    }
+  ]
+}

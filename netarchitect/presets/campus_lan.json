@@ -1,0 +1,249 @@
+{
+  "name": "Campus LAN - 3 buildings, 1,600 endpoints",
+  "profile": "campus_lan",
+  "root_prefix": "10.10.0.0/16",
+  "resiliency": "standard",
+  "native_vlan": 999,
+  "mgmt_vlan": 99,
+  "sites": [
+    {
+      "name": "MAIN-CAMPUS",
+      "role": "hq",
+      "endpoints": 1600,
+      "buildings": [
+        {
+          "name": "BLDG-A",
+          "core": true,
+          "endpoints": 650,
+          "aps": 30,
+          "data_vlan": 10,
+          "drop_distance_m": 90,
+          "uplink": {
+            "distance_m": 45,
+            "bandwidth_gbps": 10
+          }
+        },
+        {
+          "name": "BLDG-B",
+          "endpoints": 520,
+          "aps": 30,
+          "data_vlan": 11,
+          "drop_distance_m": 95,
+          "uplink": {
+            "distance_m": 180,
+            "bandwidth_gbps": 20
+          }
+        },
+        {
+          "name": "BLDG-C",
+          "endpoints": 430,
+          "aps": 25,
+          "data_vlan": 12,
+          "drop_distance_m": 100,
+          "uplink": {
+            "distance_m": 340,
+            "bandwidth_gbps": 20
+          }
+        }
+      ],
+      "subnets": [
+        {
+          "name": "STAFF-A",
+          "vlan": 10,
+          "hosts": 480,
+          "role": "data",
+          "buildings": [
+            "BLDG-A"
+          ]
+        },
+        {
+          "name": "STAFF-B",
+          "vlan": 11,
+          "hosts": 380,
+          "role": "data",
+          "buildings": [
+            "BLDG-B"
+          ]
+        },
+        {
+          "name": "STAFF-C",
+          "vlan": 12,
+          "hosts": 300,
+          "role": "data",
+          "buildings": [
+            "BLDG-C"
+          ]
+        },
+        {
+          "name": "VOICE",
+          "vlan": 20,
+          "hosts": 300,
+          "role": "voice"
+        },
+        {
+          "name": "WIFI-CORP",
+          "vlan": 30,
+          "hosts": 400,
+          "role": "wireless"
+        },
+        {
+          "name": "GUEST-WIFI",
+          "vlan": 40,
+          "hosts": 250,
+          "role": "guest"
+        },
+        {
+          "name": "AP-MGMT",
+          "vlan": 50,
+          "hosts": 90,
+          "role": "ap"
+        },
+        {
+          "name": "SERVERS",
+          "vlan": 60,
+          "hosts": 40,
+          "role": "servers",
+          "buildings": [
+            "BLDG-A"
+          ]
+        },
+        {
+          "name": "NET-MGMT",
+          "vlan": 99,
+          "hosts": 24,
+          "role": "mgmt"
+        }
+      ]
+    }
+  ],
+  "acls": [
+    {
+      "name": "GUEST-ISOLATION",
+      "apply_vlan": 40,
+      "direction": "in",
+      "rules": [
+        {
+          "action": "permit",
+          "proto": "udp",
+          "src": "any",
+          "dst": "any",
+          "dport": 67,
+          "remark": "DHCP"
+        },
+        {
+          "action": "permit",
+          "proto": "udp",
+          "src": "GUEST-WIFI",
+          "dst": "SERVERS",
+          "dport": 53,
+          "remark": "DNS only"
+        },
+        {
+          "action": "deny",
+          "proto": "ip",
+          "src": "GUEST-WIFI",
+          "dst": "ROOT",
+          "remark": "no access to internal RFC1918 space"
+        },
+        {
+          "action": "permit",
+          "proto": "ip",
+          "src": "GUEST-WIFI",
+          "dst": "any",
+          "remark": "Internet"
+        }
+      ]
+    },
+    {
+      "name": "PROTECT-MGMT",
+      "apply_vlan": 99,
+      "direction": "out",
+      "rules": [
+        {
+          "action": "permit",
+          "proto": "tcp",
+          "src": "SERVERS",
+          "dst": "NET-MGMT",
+          "dport": 22,
+          "remark": "jump host SSH to mgmt hosts"
+        },
+        {
+          "action": "permit",
+          "proto": "udp",
+          "src": "SERVERS",
+          "dst": "NET-MGMT",
+          "remark": "SNMP polling of mgmt-VLAN devices",
+          "dport": 161
+        },
+        {
+          "action": "permit",
+          "proto": "tcp",
+          "src": "any",
+          "dst": "NET-MGMT",
+          "established": true,
+          "remark": "return traffic for sessions opened by mgmt hosts"
+        },
+        {
+          "action": "permit",
+          "proto": "udp",
+          "src": "any",
+          "dst": "NET-MGMT",
+          "sport": 161,
+          "remark": "SNMP responses from managed devices"
+        },
+        {
+          "action": "permit",
+          "proto": "udp",
+          "src": "SERVERS",
+          "dst": "NET-MGMT",
+          "sport": 53,
+          "remark": "DNS replies"
+        },
+        {
+          "action": "permit",
+          "proto": "icmp",
+          "src": "any",
+          "dst": "NET-MGMT",
+          "remark": "ping/traceroute replies"
+        },
+        {
+          "action": "deny",
+          "proto": "ip",
+          "src": "any",
+          "dst": "NET-MGMT",
+          "remark": "block all other access to mgmt VLAN",
+          "log": true
+        }
+      ]
+    }
+  ],
+  "devices": {
+    "core": {
+      "hostname": "CORE-SW1",
+      "model": "Catalyst 3650-24PS",
+      "uplink_ifs": "GigabitEthernet1/0/{n}",
+      "edge_if": "GigabitEthernet1/0/24"
+    },
+    "access": {
+      "model": "Catalyst 2960-24TT",
+      "access_range": "FastEthernet0/1 - 20",
+      "ap_range": "FastEthernet0/21 - 22",
+      "unused_range": "FastEthernet0/23 - 24",
+      "uplink_ifs": "GigabitEthernet0/{n}"
+    },
+    "edge": {
+      "hostname": "EDGE-RTR1",
+      "model": "ISR4331",
+      "core_if": "GigabitEthernet0/0/0",
+      "isp_if": "GigabitEthernet0/0/1",
+      "isp_ip": "203.0.113.2",
+      "isp_mask": "255.255.255.252",
+      "isp_gw": "203.0.113.1",
+      "core_link": {
+        "distance_m": 15,
+        "bandwidth_gbps": 10
+      }
+    }
+  },
+  "parking_vlan": 998
+}

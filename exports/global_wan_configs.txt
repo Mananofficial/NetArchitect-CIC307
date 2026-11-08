@@ -1,0 +1,477 @@
+! ===================================================================
+! NetArchitect configuration export - Global WAN - 4 cities + Cloud VPC, 2,000 IoT/scanners
+! Profile: global_wan   Root: 10.50.0.0/16
+! Topology: Hub-and-spoke WAN with cloud transit at hub
+! Routing: OSPF multi-area + eBGP
+! Devices: DEL-RTR1, BOM-RTR1, BLR-RTR1, MAA-RTR1
+! ===================================================================
+
+! ######## DEVICE: DEL-RTR1 ########
+! NetArchitect generated configuration - Global WAN - 4 cities + Cloud VPC, 2,000 IoT/scanners
+! Device: DEL-RTR1   Platform: ISR4331 / CSR1000v (GNS3)
+! Replace every CHANGE-ME secret before production use.
+!
+enable
+configure terminal
+hostname DEL-RTR1
+no ip domain-lookup
+ip domain-name netarchitect.local
+service password-encryption
+enable secret CHANGE-ME-enable
+username netadmin privilege 15 secret CHANGE-ME-admin
+banner motd ^Authorized access only - DEL-RTR1^
+!
+ip dhcp excluded-address 10.50.0.1 10.50.0.10
+ip dhcp pool DEL-USERS
+ network 10.50.0.0 255.255.254.0
+ default-router 10.50.0.1
+ dns-server 1.1.1.1
+!
+ip dhcp excluded-address 10.50.2.1 10.50.2.10
+ip dhcp pool DEL-IOT
+ network 10.50.2.0 255.255.254.0
+ default-router 10.50.2.1
+ dns-server 1.1.1.1
+!
+ip dhcp excluded-address 10.50.4.1 10.50.4.10
+ip dhcp pool DEL-SCANNERS
+ network 10.50.4.0 255.255.255.0
+ default-router 10.50.4.1
+ dns-server 1.1.1.1
+!
+ip access-list extended IOT-SEGMENT
+ remark DHCP
+ permit udp any any eq 67
+ remark DNS resolution for cloud broker FQDN
+ permit udp 10.50.2.0 0.0.1.255 any eq 53
+ remark MQTT/TLS to cloud broker
+ permit tcp 10.50.2.0 0.0.1.255 10.100.0.0 0.0.255.255 eq 8883
+ remark HTTPS telemetry
+ permit tcp 10.50.2.0 0.0.1.255 10.100.0.0 0.0.255.255 eq 443
+ remark no lateral movement into enterprise
+ deny ip 10.50.2.0 0.0.1.255 10.50.0.0 0.0.255.255 log
+ remark default deny
+ deny ip any any
+!
+interface Loopback0
+ ip address 10.50.5.32 255.255.255.255
+!
+interface GigabitEthernet0/0
+ description 802.1Q trunk to site LAN switch
+ no ip address
+ no shutdown
+!
+interface GigabitEthernet0/0.10
+ description DEL-USERS 10.50.0.0/23
+ encapsulation dot1Q 10
+ ip address 10.50.0.1 255.255.254.0
+!
+interface GigabitEthernet0/0.30
+ description DEL-IOT 10.50.2.0/23
+ encapsulation dot1Q 30
+ ip address 10.50.2.1 255.255.254.0
+ ip access-group IOT-SEGMENT in
+!
+interface GigabitEthernet0/0.40
+ description DEL-SCANNERS 10.50.4.0/24
+ encapsulation dot1Q 40
+ ip address 10.50.4.1 255.255.255.0
+!
+interface GigabitEthernet0/0.99
+ description DEL-MGMT 10.50.5.0/27
+ encapsulation dot1Q 99
+ ip address 10.50.5.1 255.255.255.224
+!
+interface GigabitEthernet1/0
+ description PRIMARY to BOM-RTR1 - Carrier WAN circuit (MEF E-Line / Internet) / 1000BASE-LX SFP at carrier NID / 1400 km
+ ip address 10.50.12.32 255.255.255.254
+ ip ospf network point-to-point
+ ip ospf cost 10
+ no shutdown
+!
+interface GigabitEthernet2/0
+ description PRIMARY to BLR-RTR1 - Carrier WAN circuit (MEF E-Line / Internet) / 1000BASE-LX SFP at carrier NID / 2150 km
+ ip address 10.50.19.160 255.255.255.254
+ ip ospf network point-to-point
+ ip ospf cost 10
+ no shutdown
+!
+interface GigabitEthernet3/0
+ description PRIMARY to MAA-RTR1 - Carrier WAN circuit (MEF E-Line / Internet) / 1000BASE-LX SFP at carrier NID / 2200 km
+ ip address 10.50.23.160 255.255.255.254
+ ip ospf network point-to-point
+ ip ospf cost 10
+ no shutdown
+!
+interface GigabitEthernet9/0
+ description Internet uplink (IPsec underlay)
+ ip address 203.0.113.6 255.255.255.252
+ no shutdown
+!
+ip route 198.51.100.10 255.255.255.255 203.0.113.5
+ip route 10.50.0.0 255.255.0.0 Null0 254 name BGP-AGGREGATE-ANCHOR
+!
+crypto ikev2 proposal CLOUD-PROP
+ encryption aes-cbc-256
+ integrity sha256
+ group 14
+crypto ikev2 policy CLOUD-POL
+ proposal CLOUD-PROP
+!
+crypto ikev2 keyring CLOUD-KR
+ peer CLOUD-VGW
+  address 198.51.100.10
+  pre-shared-key CHANGE-ME-PSK
+!
+crypto ikev2 profile CLOUD-IKEV2
+ match identity remote address 198.51.100.10 255.255.255.255
+ authentication remote pre-share
+ authentication local pre-share
+ keyring local CLOUD-KR
+!
+crypto ipsec transform-set CLOUD-TS esp-aes 256 esp-sha256-hmac
+ mode tunnel
+!
+crypto ipsec profile CLOUD-IPSEC
+ set transform-set CLOUD-TS
+ set ikev2-profile CLOUD-IKEV2
+ set pfs group14
+!
+interface Tunnel100
+ description IPsec VTI to AWS-VPC-MUMBAI
+ ip address 169.254.10.2 255.255.255.252
+ ip tcp adjust-mss 1379
+ tunnel source GigabitEthernet9/0
+ tunnel mode ipsec ipv4
+ tunnel destination 198.51.100.10
+ tunnel protection ipsec profile CLOUD-IPSEC
+ no shutdown
+!
+ip prefix-list TO-CLOUD seq 5 permit 10.50.0.0/16
+ip prefix-list FROM-CLOUD seq 5 permit 10.100.0.0/16
+!
+route-map CLOUD-INTO-OSPF permit 10
+ match ip address prefix-list FROM-CLOUD
+!
+router bgp 65050
+ bgp log-neighbor-changes
+ neighbor 169.254.10.1 remote-as 64512
+ neighbor 169.254.10.1 description AWS-VPC-MUMBAI
+ address-family ipv4
+  network 10.50.0.0 mask 255.255.0.0
+  neighbor 169.254.10.1 activate
+  neighbor 169.254.10.1 prefix-list TO-CLOUD out
+  neighbor 169.254.10.1 prefix-list FROM-CLOUD in
+ exit-address-family
+!
+router ospf 1
+ router-id 10.50.5.32
+ auto-cost reference-bandwidth 100000
+ passive-interface default
+ no passive-interface GigabitEthernet1/0
+ no passive-interface GigabitEthernet2/0
+ no passive-interface GigabitEthernet3/0
+ network 10.50.0.0 0.0.1.255 area 0
+ network 10.50.2.0 0.0.1.255 area 0
+ network 10.50.4.0 0.0.0.255 area 0
+ network 10.50.5.0 0.0.0.31 area 0
+ network 10.50.5.32 0.0.0.0 area 0
+ network 10.50.12.32 0.0.0.1 area 1
+ network 10.50.19.160 0.0.0.1 area 2
+ network 10.50.23.160 0.0.0.1 area 3
+ area 1 range 10.50.8.0 255.255.248.0
+ area 2 range 10.50.16.0 255.255.252.0
+ area 3 range 10.50.20.0 255.255.252.0
+ redistribute bgp 65050 subnets route-map CLOUD-INTO-OSPF
+!
+!
+crypto key generate rsa modulus 2048
+ip ssh version 2
+line con 0
+ logging synchronous
+ login local
+line vty 0 4
+ login local
+ transport input ssh
+!
+end
+write memory
+
+! ######## DEVICE: BOM-RTR1 ########
+! NetArchitect generated configuration - Global WAN - 4 cities + Cloud VPC, 2,000 IoT/scanners
+! Device: BOM-RTR1   Platform: ISR4331 / CSR1000v (GNS3)
+! Replace every CHANGE-ME secret before production use.
+!
+enable
+configure terminal
+hostname BOM-RTR1
+no ip domain-lookup
+ip domain-name netarchitect.local
+service password-encryption
+enable secret CHANGE-ME-enable
+username netadmin privilege 15 secret CHANGE-ME-admin
+banner motd ^Authorized access only - BOM-RTR1^
+!
+ip dhcp excluded-address 10.50.8.1 10.50.8.10
+ip dhcp pool BOM-IOT
+ network 10.50.8.0 255.255.254.0
+ default-router 10.50.8.1
+ dns-server 1.1.1.1
+!
+ip dhcp excluded-address 10.50.10.1 10.50.10.10
+ip dhcp pool BOM-USERS
+ network 10.50.10.0 255.255.255.0
+ default-router 10.50.10.1
+ dns-server 1.1.1.1
+!
+ip dhcp excluded-address 10.50.11.1 10.50.11.10
+ip dhcp pool BOM-SCANNERS
+ network 10.50.11.0 255.255.255.0
+ default-router 10.50.11.1
+ dns-server 1.1.1.1
+!
+interface Loopback0
+ ip address 10.50.12.34 255.255.255.255
+!
+interface GigabitEthernet0/0
+ description 802.1Q trunk to site LAN switch
+ no ip address
+ no shutdown
+!
+interface GigabitEthernet0/0.30
+ description BOM-IOT 10.50.8.0/23
+ encapsulation dot1Q 30
+ ip address 10.50.8.1 255.255.254.0
+!
+interface GigabitEthernet0/0.10
+ description BOM-USERS 10.50.10.0/24
+ encapsulation dot1Q 10
+ ip address 10.50.10.1 255.255.255.0
+!
+interface GigabitEthernet0/0.40
+ description BOM-SCANNERS 10.50.11.0/24
+ encapsulation dot1Q 40
+ ip address 10.50.11.1 255.255.255.0
+!
+interface GigabitEthernet0/0.99
+ description BOM-MGMT 10.50.12.0/27
+ encapsulation dot1Q 99
+ ip address 10.50.12.1 255.255.255.224
+!
+interface GigabitEthernet1/0
+ description PRIMARY to DEL-RTR1 - Carrier WAN circuit (MEF E-Line / Internet) / 1000BASE-LX SFP at carrier NID / 1400 km
+ ip address 10.50.12.33 255.255.255.254
+ ip ospf network point-to-point
+ ip ospf cost 10
+ no shutdown
+!
+router ospf 1
+ router-id 10.50.12.34
+ auto-cost reference-bandwidth 100000
+ passive-interface default
+ no passive-interface GigabitEthernet1/0
+ network 10.50.8.0 0.0.1.255 area 1
+ network 10.50.10.0 0.0.0.255 area 1
+ network 10.50.11.0 0.0.0.255 area 1
+ network 10.50.12.0 0.0.0.31 area 1
+ network 10.50.12.34 0.0.0.0 area 1
+ network 10.50.12.32 0.0.0.1 area 1
+!
+!
+crypto key generate rsa modulus 2048
+ip ssh version 2
+line con 0
+ logging synchronous
+ login local
+line vty 0 4
+ login local
+ transport input ssh
+!
+end
+write memory
+
+! ######## DEVICE: BLR-RTR1 ########
+! NetArchitect generated configuration - Global WAN - 4 cities + Cloud VPC, 2,000 IoT/scanners
+! Device: BLR-RTR1   Platform: ISR4331 / CSR1000v (GNS3)
+! Replace every CHANGE-ME secret before production use.
+!
+enable
+configure terminal
+hostname BLR-RTR1
+no ip domain-lookup
+ip domain-name netarchitect.local
+service password-encryption
+enable secret CHANGE-ME-enable
+username netadmin privilege 15 secret CHANGE-ME-admin
+banner motd ^Authorized access only - BLR-RTR1^
+!
+ip dhcp excluded-address 10.50.16.1 10.50.16.10
+ip dhcp pool BLR-IOT
+ network 10.50.16.0 255.255.254.0
+ default-router 10.50.16.1
+ dns-server 1.1.1.1
+!
+ip dhcp excluded-address 10.50.18.1 10.50.18.10
+ip dhcp pool BLR-SCANNERS
+ network 10.50.18.0 255.255.255.0
+ default-router 10.50.18.1
+ dns-server 1.1.1.1
+!
+ip dhcp excluded-address 10.50.19.1 10.50.19.10
+ip dhcp pool BLR-USERS
+ network 10.50.19.0 255.255.255.128
+ default-router 10.50.19.1
+ dns-server 1.1.1.1
+!
+interface Loopback0
+ ip address 10.50.19.162 255.255.255.255
+!
+interface GigabitEthernet0/0
+ description 802.1Q trunk to site LAN switch
+ no ip address
+ no shutdown
+!
+interface GigabitEthernet0/0.30
+ description BLR-IOT 10.50.16.0/23
+ encapsulation dot1Q 30
+ ip address 10.50.16.1 255.255.254.0
+!
+interface GigabitEthernet0/0.40
+ description BLR-SCANNERS 10.50.18.0/24
+ encapsulation dot1Q 40
+ ip address 10.50.18.1 255.255.255.0
+!
+interface GigabitEthernet0/0.10
+ description BLR-USERS 10.50.19.0/25
+ encapsulation dot1Q 10
+ ip address 10.50.19.1 255.255.255.128
+!
+interface GigabitEthernet0/0.99
+ description BLR-MGMT 10.50.19.128/27
+ encapsulation dot1Q 99
+ ip address 10.50.19.129 255.255.255.224
+!
+interface GigabitEthernet1/0
+ description PRIMARY to DEL-RTR1 - Carrier WAN circuit (MEF E-Line / Internet) / 1000BASE-LX SFP at carrier NID / 2150 km
+ ip address 10.50.19.161 255.255.255.254
+ ip ospf network point-to-point
+ ip ospf cost 10
+ no shutdown
+!
+router ospf 1
+ router-id 10.50.19.162
+ auto-cost reference-bandwidth 100000
+ passive-interface default
+ no passive-interface GigabitEthernet1/0
+ network 10.50.16.0 0.0.1.255 area 2
+ network 10.50.18.0 0.0.0.255 area 2
+ network 10.50.19.0 0.0.0.127 area 2
+ network 10.50.19.128 0.0.0.31 area 2
+ network 10.50.19.162 0.0.0.0 area 2
+ network 10.50.19.160 0.0.0.1 area 2
+!
+!
+crypto key generate rsa modulus 2048
+ip ssh version 2
+line con 0
+ logging synchronous
+ login local
+line vty 0 4
+ login local
+ transport input ssh
+!
+end
+write memory
+
+! ######## DEVICE: MAA-RTR1 ########
+! NetArchitect generated configuration - Global WAN - 4 cities + Cloud VPC, 2,000 IoT/scanners
+! Device: MAA-RTR1   Platform: ISR4331 / CSR1000v (GNS3)
+! Replace every CHANGE-ME secret before production use.
+!
+enable
+configure terminal
+hostname MAA-RTR1
+no ip domain-lookup
+ip domain-name netarchitect.local
+service password-encryption
+enable secret CHANGE-ME-enable
+username netadmin privilege 15 secret CHANGE-ME-admin
+banner motd ^Authorized access only - MAA-RTR1^
+!
+ip dhcp excluded-address 10.50.20.1 10.50.20.10
+ip dhcp pool MAA-IOT
+ network 10.50.20.0 255.255.254.0
+ default-router 10.50.20.1
+ dns-server 1.1.1.1
+!
+ip dhcp excluded-address 10.50.22.1 10.50.22.10
+ip dhcp pool MAA-SCANNERS
+ network 10.50.22.0 255.255.255.0
+ default-router 10.50.22.1
+ dns-server 1.1.1.1
+!
+ip dhcp excluded-address 10.50.23.1 10.50.23.10
+ip dhcp pool MAA-USERS
+ network 10.50.23.0 255.255.255.128
+ default-router 10.50.23.1
+ dns-server 1.1.1.1
+!
+interface Loopback0
+ ip address 10.50.23.162 255.255.255.255
+!
+interface GigabitEthernet0/0
+ description 802.1Q trunk to site LAN switch
+ no ip address
+ no shutdown
+!
+interface GigabitEthernet0/0.30
+ description MAA-IOT 10.50.20.0/23
+ encapsulation dot1Q 30
+ ip address 10.50.20.1 255.255.254.0
+!
+interface GigabitEthernet0/0.40
+ description MAA-SCANNERS 10.50.22.0/24
+ encapsulation dot1Q 40
+ ip address 10.50.22.1 255.255.255.0
+!
+interface GigabitEthernet0/0.10
+ description MAA-USERS 10.50.23.0/25
+ encapsulation dot1Q 10
+ ip address 10.50.23.1 255.255.255.128
+!
+interface GigabitEthernet0/0.99
+ description MAA-MGMT 10.50.23.128/27
+ encapsulation dot1Q 99
+ ip address 10.50.23.129 255.255.255.224
+!
+interface GigabitEthernet1/0
+ description PRIMARY to DEL-RTR1 - Carrier WAN circuit (MEF E-Line / Internet) / 1000BASE-LX SFP at carrier NID / 2200 km
+ ip address 10.50.23.161 255.255.255.254
+ ip ospf network point-to-point
+ ip ospf cost 10
+ no shutdown
+!
+router ospf 1
+ router-id 10.50.23.162
+ auto-cost reference-bandwidth 100000
+ passive-interface default
+ no passive-interface GigabitEthernet1/0
+ network 10.50.20.0 0.0.1.255 area 3
+ network 10.50.22.0 0.0.0.255 area 3
+ network 10.50.23.0 0.0.0.127 area 3
+ network 10.50.23.128 0.0.0.31 area 3
+ network 10.50.23.162 0.0.0.0 area 3
+ network 10.50.23.160 0.0.0.1 area 3
+!
+!
+crypto key generate rsa modulus 2048
+ip ssh version 2
+line con 0
+ logging synchronous
+ login local
+line vty 0 4
+ login local
+ transport input ssh
+!
+end
+write memory
