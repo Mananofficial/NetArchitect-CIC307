@@ -101,6 +101,7 @@ To verify:
 
 **Platform notes (be ready to explain these):**
 - Packet Tracer's IOS subset does not support **BFD**, **IKEv2/VTI** or parts of **MQC QoS**. Those lines are rejected in PT but are valid IOS/IOS-XE. Run the WAN profile in **GNS3** (CSR1000v / IOSv) for the IPsec + BGP section, or accept the rejected lines in PT and demonstrate OSPF there.
+- Packet Tracer does not accept RFC 3021 **/31** point-to-point addresses, which real IOS does. In the PT build, the CORE-SW1 ↔ EDGE-RTR1 link was readdressed to the free /30 10.10.12.0/30 (.1 core, .2 edge) so OSPF could form. The exported configs keep the /31, which is correct for real hardware.
 - The 10G optics and 10GBASE-T are what the engine *recommends* for the real build. PT models only offer 1G ports, so the bandwidth is emulated.
 - All `CHANGE-ME` secrets must be replaced. Public IPs use the RFC 5737 documentation ranges.
 
