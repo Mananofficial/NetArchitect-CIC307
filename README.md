@@ -104,6 +104,12 @@ To verify:
 - The 10G optics and 10GBASE-T are what the engine *recommends* for the real build. PT models only offer 1G ports, so the bandwidth is emulated.
 - All `CHANGE-ME` secrets must be replaced. Public IPs use the RFC 5737 documentation ranges.
 
+## Verification evidence
+- `docs/VERIFICATION_CHECKLIST.md`: every Packet Tracer check with its expected result
+- `screenshots/`: Packet Tracer screenshots (campus: VLANs, trunks, LACP, STP root, OSPF, DHCP, ping; MAN: OSPF neighbours, inter-area summaries, failover from primary to EVPL)
+- `exports/campus_lan.pkt`, `exports/metro_man.pkt`: the Packet Tracer files
+- **Global WAN:** `exports/global_wan_configs.txt` is intended for **GNS3** (CSR1000v / IOSv), because Packet Tracer cannot run IKEv2/IPsec VTI or eBGP to a cloud gateway. Its OSPF multi-area design is identical in structure to the MAN profile verified in Packet Tracer.
+
 ## Project structure
 ```
 netarchitect/
